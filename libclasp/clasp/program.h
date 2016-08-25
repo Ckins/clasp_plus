@@ -17,7 +17,6 @@ namespace Sysu {
     public:
         prg(int a);
     };
-
 }
 
 #endif //CLASP_PROGRAM_H
