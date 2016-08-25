@@ -316,7 +316,6 @@ bool SequentialSolve::doSolve(SharedContext& ctx, const LitVec& gp) {
 	// under the current assumptions but not necessarily unsat.
 	for (ValueRep res; more; solve.reset()) {
 		while ((res = solve.solve()) == value_true && (!enumerator().commitModel(s) || reportModel(s))) {
-			std::cout << "update----------------------" << std::endl;
 			enumerator().update(s);
 		}
 		if      (res != value_false)           { more = (res == value_free || moreModels(s)); break; }

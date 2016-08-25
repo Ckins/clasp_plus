@@ -1641,16 +1641,17 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
             // SYSU Modification (junhong 16/08/25)
             //------------------
             Sysu::Prg* prg = Sysu::Prg::getPrg();
+
+			// prg->doSolve(P, N);
             // prg->print_all_rules();
             //------------------
             // End Modification
-
 
 			// Input : (P, N)
 			// Output: AS or continue
 			/*if call-consistent(P, N) {
 
-				if (P, N) ==  fixed point W(P, N) {
+				if (P, N) == W(P, N) as fixed point{
 					return W-expand(P, N) as AS
 				} else {
 

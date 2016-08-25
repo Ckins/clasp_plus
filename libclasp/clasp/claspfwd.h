@@ -51,7 +51,8 @@ class  PrgHead;
 class  PrgNode;
 struct PrgEdge;
 class  SccChecker;
-}}
+}
+}
 
 
 #endif

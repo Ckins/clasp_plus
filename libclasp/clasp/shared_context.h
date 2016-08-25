@@ -42,7 +42,6 @@ class SharedContext;
 class SharedLiterals;
 class SharedDependencyGraph;
 struct SolverStats;
-
 /*!
  * \addtogroup solver
  */
