@@ -30,12 +30,6 @@
 #include <sstream>
 #include <climits>
 
-/*
- * modified by kinsang
- *
- */
-#include <clasp/program.h>
-
 
 namespace Clasp { namespace Asp {
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -472,11 +466,6 @@ bool LogicProgram::isExternal(Var aId) const {
 
 LogicProgram& LogicProgram::addRule(const Rule& r) {
 	check_not_frozen();
-
-	std::cout << "hell";
-	// experiment 1
-	int tmp = 5;
-	Sysu::prg a(tmp);
 
 	// simplify rule
 	RuleType t = simplifyRule(r, activeHead_, activeBody_);
