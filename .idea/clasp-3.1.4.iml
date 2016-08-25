@@ -2,8 +2,8 @@
 <module type="CPP_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/clasp_facade.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/weight_constraint.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/logic_program_types.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/constraint.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/timer.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/clasp_options.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/enumerator.cpp" isTestSource="false" />
@@ -11,35 +11,37 @@
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/solver_strategies.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/asp_preprocessor.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/shared_context.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/minimize_constraint.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/logic_program_types.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/clasp_facade.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/satelite.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/logic_program.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/solve_algorithms.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/cb_enumerator.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/constraint.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/parallel_solve.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/logic_program.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/heuristics.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/program.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/solver_types.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/solver.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/dependency_graph.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/lookahead.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/minimize_constraint.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/model_enumerators.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/satelite.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/heuristics.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/clasp_output.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/clause.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/parser.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/src/program_builder.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/solver_types.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libclasp/src/weight_constraint.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libclasp/clasp/program.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libclasp/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/app/clasp_app.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/app/main.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/app/clasp_app.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/app/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tools/FindTBB.cmake" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/libprogram_opts/src/value_store.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libprogram_opts/src/string_convert.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libprogram_opts/src/application.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libprogram_opts/src/alarm.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libprogram_opts/src/program_options.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/libprogram_opts/src/string_convert.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libprogram_opts/src/value_store.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libprogram_opts/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
     </content>
