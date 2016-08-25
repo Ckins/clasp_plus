@@ -739,7 +739,7 @@ void Solver::setConflict(Literal p, const Antecedent& a, uint32 data) {
 
 bool Solver::assume(const Literal& p) {
 
-	printAssignment();
+	// printAssignment();
 
 	if (value(p.var()) == value_free) {
 		assert(decisionLevel() != assign_.maxLevel());
@@ -1633,6 +1633,30 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
 				if (hasConflict() || (decisionLevel() == 0 && !simplify())) { return value_false; }
 				if ((limit.reached() || learntLimit(limit))&&numFreeVars()) { return value_free;  }
 			}
+
+			// w(P, N) = (P', N') - fixed point and call-consistent
+			// unconverged limits upperbound = number of atoms
+
+			printAssignment();
+
+
+			// Input : (P, N)
+			// Output: AS or continue
+			/*if call-consistent(P, N) {
+
+				if (P, N) ==  fixed point W(P, N) {
+					return W-expand(P, N) as AS
+				} else {
+
+					// carefully check the number of steps
+					(P', N') = iterativeW(P, N);
+				}
+
+				if (P', N') call-consitent {
+					return W-expand(P', N') as As
+				}
+			}*/
+
 			if (decideNextBranch(rf)) { conflicts = !propagate(); }
 			else                      { break; }
 		}
@@ -1651,7 +1675,10 @@ void Solver::printAssignment() {
 	// travelsal the symbol table to print the partial assignment
 	for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
 		if (assign_.value(it->second.lit.var()) == trueValue(it->second.lit)) {
-			std::cout << it->second.name.c_str() << std::endl;
+			std::cout << "true:" << it->second.name.c_str() << std::endl;
+		}
+		if (assign_.value(it->second.lit.var()) == falseValue(it->second.lit)) {
+			std::cout << "false:" << it->second.name.c_str() << std::endl;
 		}
 	}
 	std::cout << "-----------------------------------------------" << std::endl;

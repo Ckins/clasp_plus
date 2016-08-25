@@ -50,7 +50,7 @@ struct SearchLimits {
 };
 
 /**
- * \defgroup solver Solver and related classes.
+ * \def group solver Solver and related classes.
  */
 //@{
 

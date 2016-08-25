@@ -23,6 +23,8 @@
 #include <clasp/minimize_constraint.h>
 #include <clasp/util/timer.h>
 #include <clasp/util/atomic.h>
+
+#include <iostream>
 namespace Clasp { 
 /////////////////////////////////////////////////////////////////////////////////////////
 // Basic solve
@@ -307,12 +309,14 @@ bool SequentialSolve::doSolve(SharedContext& ctx, const LitVec& gp) {
 	SolveLimits  lim = limits();
 	uint32      root = s.rootLevel();
 	BasicSolve solve(s, ctx.configuration()->search(0), &lim);
+	ctx.sccGraph;
 	bool        stop = term_ && !term_->attach(s);
 	bool        more = !stop && ctx.attach(s) && enumerator().start(s, gp);
 	// Add assumptions - if this fails, the problem is unsat 
 	// under the current assumptions but not necessarily unsat.
 	for (ValueRep res; more; solve.reset()) {
 		while ((res = solve.solve()) == value_true && (!enumerator().commitModel(s) || reportModel(s))) {
+			std::cout << "update----------------------" << std::endl;
 			enumerator().update(s);
 		}
 		if      (res != value_false)           { more = (res == value_free || moreModels(s)); break; }

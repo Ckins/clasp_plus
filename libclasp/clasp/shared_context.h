@@ -153,7 +153,7 @@ private:
 //@}
 
 /**
- * \defgroup shared Types shared between solvers.
+ * \def group shared Types shared between solvers.
  */
 //@{
 
