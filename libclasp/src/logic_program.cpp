@@ -29,6 +29,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <climits>
+#include <clasp/program.h>
 
 
 namespace Clasp { namespace Asp {
@@ -465,8 +466,16 @@ bool LogicProgram::isExternal(Var aId) const {
 }
 
 LogicProgram& LogicProgram::addRule(const Rule& r) {
-	check_not_frozen();
 
+	// SYSU Modification (junhong 16/08/25)
+	//------------------
+	Sysu::Rule* rule = new Sysu::Rule(r);
+	Sysu::Prg* prg = Sysu::Prg::getPrg();
+	prg->rules.push_back(rule);
+	//------------------
+	// End Modification
+
+	check_not_frozen();
 	// simplify rule
 	RuleType t = simplifyRule(r, activeHead_, activeBody_);
 	if (t != ENDRULE) { // rule is relevant

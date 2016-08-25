@@ -18,6 +18,10 @@ namespace Sysu {
     public:
         Clasp::VarVec heads;
         Clasp::WeightLitVec body;
+        Rule(const Clasp::Asp::Rule& r) {
+            heads = r.heads;
+            body = r.body;
+        }
     };
 
     // typedef Clasp::Asp::Rule Rule;
@@ -40,7 +44,7 @@ namespace Sysu {
 
     class Prg {
     public:
-        Prg();
+        static Prg* getPrg();
         DependencyGraph dependencyGraph;
         const Clasp::SymbolTable* symbolTablePtr;
         RuleList rules;
@@ -48,6 +52,8 @@ namespace Sysu {
 
         void update(AtomSet P, AtomSet N);
         void print_all_rules();
+    private:
+        Prg();
     };
 }
 

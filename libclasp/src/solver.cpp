@@ -1637,7 +1637,13 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
 			// w(P, N) = (P', N') - fixed point and call-consistent
 			// unconverged limits upperbound = number of atoms
 
-			printAssignment();
+
+            // SYSU Modification (junhong 16/08/25)
+            //------------------
+            Sysu::Prg* prg = Sysu::Prg::getPrg();
+            // prg->print_all_rules();
+            //------------------
+            // End Modification
 
 
 			// Input : (P, N)

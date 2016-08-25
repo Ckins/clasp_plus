@@ -6,6 +6,10 @@
 #include <iostream>
 
 namespace Sysu {
+    Prg* Prg::getPrg() {
+        static Prg prg;
+        return &prg;
+    }
     Prg::Prg() {
     }
     void Prg::print_all_rules() {
