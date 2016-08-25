@@ -115,7 +115,9 @@ namespace Sysu {
          * Input : original RuleList, P, N
          * Output : the pointer pointing at the gragh with the reduced rules
         */
-        void reduce_with_assignment();
+        // void reduce_with_assignment();
+
+        void do_solve(const AtomSet& P, const AtomSet& N);
 
         // auxiliary function
         static Prg* getPrg();

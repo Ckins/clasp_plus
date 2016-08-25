@@ -12,6 +12,9 @@ namespace Sysu {
     }
     Prg::Prg() {
     }
+
+    void Prg::do_solve(const AtomSet &P, const AtomSet &N) { }
+
     void Prg::print_all_rules() {
         for (RuleList::const_iterator rit = rules.begin(); rit != rules.end(); ++rit) {
             std::cout << "Rule: ";

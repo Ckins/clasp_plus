@@ -1664,6 +1664,12 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
 				}
 			}*/
 
+			// kinsang modification start
+
+			call_consistent_check();
+
+			// printAssignment();
+
 			if (decideNextBranch(rf)) { conflicts = !propagate(); }
 			else                      { break; }
 		}
@@ -1676,7 +1682,9 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
 }
 
 void Solver::printAssignment() {
-	// kinsang modified for debugging - Aug 15
+	// kinsang modified for debugging
+	// modified on Aug 25
+
 	std::cout << "This is No." << ++count_emu_num << " assumption:" << std::endl;
 
 	// travelsal the symbol table to print the partial assignment
@@ -1690,6 +1698,23 @@ void Solver::printAssignment() {
 	}
 	std::cout << "-----------------------------------------------" << std::endl;
 	// end modification
+}
+
+void Solver::call_consistent_check() {
+	Sysu::AtomSet P;
+	Sysu::AtomSet N;
+	Sysu::Prg* prg = Sysu::Prg::getPrg();
+
+	// travelsal the symbol table to get the partial assignment
+	for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
+		if (assign_.value(it->second.lit.var()) == trueValue(it->second.lit)) {
+			P.insert(it->second.lit);
+		}
+		if (assign_.value(it->second.lit.var()) == falseValue(it->second.lit)) {
+			N.insert(it->second.lit);
+		}
+	}
+	prg->do_solve(P, N);
 }
 
 }
