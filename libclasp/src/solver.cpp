@@ -1668,7 +1668,7 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
 
 			call_consistent_check();
 
-			// printAssignment();
+			printAssignment();
 
 			if (decideNextBranch(rf)) { conflicts = !propagate(); }
 			else                      { break; }
