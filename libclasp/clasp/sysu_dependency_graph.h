@@ -42,19 +42,40 @@ namespace Sysu {
 
     class DependencyGraph {
     public:
+
+        // constructor parts
         DependencyGraph(const RuleList& rules);
         void reduce (const AtomSet& P, const AtomSet& N);
-        Clasp::PodVector<SCC> checkSCC();
-        std::pair<bool, std::pair<AtomSet, AtomSet> > call_consistent(SCC scc);
-        void print_all_edges();
 
+        // construction Answer Set key algos
+
+        /*
+         * Input : (P, N)
+         * Ouput : (P', N')
+         */
+        void T_once();
+        void T_inf();
+
+        // unknown todo
+        void W_once();
+
+        /*
+         * Input : (P, N)
+         * Output : (P*, N*)
+         */
+        void W_expand();
 
         /*
          * check whether we should continue
          * if the dg under (P, N) is not call-consistent,
          * (P, N) can NOT be expanded to an AS.
          */
+        Clasp::PodVector<SCC> checkSCC();
+        std::pair<bool, std::pair<AtomSet, AtomSet> > call_consistent(SCC scc);
         bool whole_call_consistent();
+
+        // auxiliary functions
+        void print_all_edges();
 
     private:
         std::map<Var, AtomSet> depGraph;
