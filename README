@@ -1,9 +1,10 @@
-                                clasp-3.x
-              A conflict-driven nogood learning answer set solver 
-                     http://www.cs.uni-potsdam.de/clasp/
-					  http://potassco.sourceforge.net/
+Overview
+  This is an open-source project originally from Potassco Team.
+  We apply some optimization to the solver and name it as clasp plus.
 
-OVERVIEW
+Introduction
+ http://www.cs.uni-potsdam.de/clasp/
+ http://potassco.sourceforge.net/
   clasp is an answer set solver for (extended) normal and disjunctive logic programs. 
   It combines the high-level modeling capacities of answer set programming
   with state-of-the-art techniques from the area of Boolean constraint solving.

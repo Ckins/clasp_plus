@@ -29,7 +29,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <climits>
-#include <clasp/program.h>
+#include <clasp/sysu_program.h>
 
 
 namespace Clasp { namespace Asp {
@@ -469,7 +469,7 @@ LogicProgram& LogicProgram::addRule(const Rule& r) {
 
 	// SYSU Modification (junhong 16/08/25)
 	//------------------
-	Sysu::Prg::getPrg()->add_rule(new Sysu::Rule(r));
+	Sysu::Prg::getPrg()->add_rule(r);  // new Sysu::Rule(r)
 	//------------------
 	// End Modification
 

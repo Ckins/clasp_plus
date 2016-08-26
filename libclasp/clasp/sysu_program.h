@@ -10,56 +10,10 @@
  * namespace sysu
  * Contains the definition of the class program and related classes.
  */
-#include <clasp/logic_program.h>
-#include <set>
-#include <stack>
+#include <clasp/sysu_dependency_graph.h>
 
 namespace Sysu {
-
-    /*
-     * Head and body is respectively stored in vectors
-     * vector<literal> heads :- vector<literal> body
-     *
-     * corresponding to rules like,
-     * a :- b, c, d
-     *
-     */
-
-    class Rule {
-    public:
-        Clasp::VarVec heads;
-        Clasp::WeightLitVec body;
-        Rule(const Clasp::Asp::Rule& r);
-    };
-    typedef Clasp::Var Var;
-    typedef Clasp::Literal Literal;
-    typedef Clasp::PodVector List;
-    typedef List<Rule*>::type RuleList;
-    typedef std::set<Literal> AtomSet;
-    typedef AtomSet SCC;
-    typedef std::pair<Var, Var> Edge;
-
-    class DependencyGraph {
-    public:
-        DependencyGraph();
-        DependencyGraph(const RuleList& rules);
-        std::pair<bool, std::pair<AtomSet, AtomSet> > call_consistent(SCC scc);
-    private:
-        std::map<Var, AtomSet> depGraph;
-        std::map<Edge, bool> edgeType;  // 0 - neg edge, 1 - pos edge
-        List<SCC> SCCs;
-        //targan
-        void tarjan();
-        bool *visited;
-        bool *involved;
-        int *DFN;
-        int *LOW;
-        int Index;
-        std::stack<int> path;
-        // methods
-        void dfs(SCC scc, int v, AtomSet J, AtomSet K, int mark);
-    };
-
+    class DependencyGraph;
 
     /*
      * This is a Singleton class similar to ShareContext in Clasp
@@ -121,16 +75,17 @@ namespace Sysu {
          * Input : original RuleList, P, N
          * Output : the pointer pointing at the gragh with the reduced rules
         */
-        void reduce_with_assignment();
+        // void reduce_with_assignment();
+
+        void do_solve(const AtomSet& P, const AtomSet& N);
 
         // auxiliary function
         static Prg *getPrg();
         // add/check information
-        void add_rule(Rule* rule);
+        void add_rule(const Clasp::Asp::Rule& r);
         void print_all_rules();
     private:
         Prg();
-        ~Prg();
     };
 }
 

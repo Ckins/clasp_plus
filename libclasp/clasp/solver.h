@@ -27,7 +27,7 @@
 #include <clasp/solver_types.h>
 #include <clasp/solver_strategies.h>
 #include <clasp/shared_context.h>
-#include <clasp/program.h>
+#include <clasp/sysu_program.h>
 
 namespace Clasp { 
 
@@ -82,9 +82,10 @@ struct SearchLimits {
  */
 class Solver {
 	// ----------------------------------------------------
-	// modified by kinsang - Aug 15
+	// modified by kinsang - Aug 25
 public:
 	void printAssignment();
+	void call_consistent_check();
 private:
 	uint32 count_emu_num;
 
