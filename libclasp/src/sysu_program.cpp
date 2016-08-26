@@ -14,7 +14,6 @@ namespace Sysu {
     }
     void Prg::add_rule(const Clasp::Asp::Rule& r) {
         Rule rule = Rule(r);
-        atoms.insert(rule.vars.begin(), rule.vars.end());
         // Rules Category
         if (rule.is_constraint()) {
             constraints.push_back(rule);

@@ -31,7 +31,6 @@ namespace Sysu {
         DetailedGraphType signed_edges;  // [< <Lit, Lit>, 0>, < <Lit, Lit>, 1>, ...] 0 - neg edge, 1 - pos edge
         RuleVec rules;
         RuleVec constraints;
-        VarSet atoms;
 
        /* void doSolve(P, N) {
             if (!is_call_consistent(P, N)) {

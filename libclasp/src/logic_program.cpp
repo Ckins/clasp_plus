@@ -469,7 +469,7 @@ LogicProgram& LogicProgram::addRule(const Rule& r) {
 
 	// SYSU Modification (junhong 16/08/25)
 	//------------------
-	Sysu::Prg::getPrg()->add_rule(r);  // new Sysu::Rule(r)
+	Sysu::Prg::getPrg()->add_rule(r);
 	//------------------
 	// End Modification
 
