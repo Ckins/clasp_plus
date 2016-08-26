@@ -33,59 +33,17 @@ namespace Sysu {
         RuleVec constraints;
         VarSet atoms;
 
-       /* void doSolve(P, N) {
-            if (!is_call_consistent(P, N)) {
-                return;
-            }
-
-            <p2, n2> = well_founded(P, N);
-
-            // it must be able to expand the answer set!
-            if (pair<P,N> == pair<P2, N2>) {
-                print w-expand(p2, n2)
-                        exit(10);
-            }
-
-
-
-            else {
-                // p2, n2 may be able to be larger
-                do {
-                    p2, n2 =well_founded(P2, N2);
-                } while (p2,n2 change);
-
-                if (p2, n2 is call-consistent) {
-
-                   print w-expand(p2, n2);
-                }
-            }
-        }
-
-
-        // key interface
-        bool is_call_consistent(AtomSet &P, AtomSet &N) {
-
-            return dependencyGraph->is_call_consistent(P, N);
-
-        } */
-
-
-        /* It reduces the ruleList under (P, N)
-        * produce a temporary rulelist corresponding to a graph
-        * Construct the memebr "dependencyGraph"
-         *
-         * Input : original RuleList, P, N
-         * Output : the pointer pointing at the gragh with the reduced rules
+        /*
+         * Input : Partial assignment, P, N
+         * Output : Print the answer set or return to clasp
         */
-        // void reduce_with_assignment();
 
         void do_solve(const LitSet& P, const LitSet& N);
-
 
         /*
          * check whether the assignment violate constraints
          */
-        void check_constraint();
+        bool break_constraint(const LitSet &P, const LitSet &N);
 
         // auxiliary function
         static Prg *getPrg();

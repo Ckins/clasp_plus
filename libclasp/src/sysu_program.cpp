@@ -36,14 +36,31 @@ namespace Sysu {
 
     void Prg::do_solve(const LitSet &P, const LitSet &N) {
 
-        // DependencyGraph dg(ruleList);
-        // dg.reduce(P, N);
+        break_constraint(P, N);
 
-//        if (dg.whole_call_consistent()) {
-//
-//        }
+        /*
+        dependencyGraph.reduce(P, N);
+        dependencyGraph.checkSCC();
 
+        if (!dependencyGraph.whole_call_consistent()) {
+            return;
+        }
+
+        dependencyGraph.W_once(P, N);
+        // if fixed point
+        dependencyGraph.W_expand();
+
+        // (p', N') = W.inf(P', N')
+
+        // if (P', N') is null return;
+
+        // dg.reduce(p', n')
+        // dg.checkScc()
+        // if dg.whole_call-consistent, w_expand()
+        */
     }
+
+    bool Prg::break_constraint(const LitSet &P, const LitSet &N) { }
 
     void Prg::print_rules(const RuleVec& l) {
         for (RuleVec::const_iterator r_it = l.begin(); r_it != l.end(); ++r_it) {
