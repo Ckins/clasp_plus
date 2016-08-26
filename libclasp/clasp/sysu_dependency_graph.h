@@ -30,18 +30,18 @@ namespace Sysu {
     typedef std::set<Var> VarSet;
     typedef std::set<Literal> LitSet;
     typedef LitSet SCC;
-    typedef std::pair<Var, Var> Edge;
-    typedef std::pair<Var, LitVec> MultiEdge;
-    typedef Clasp::PodVector<MultiEdge>::type GraphType;
     enum EDGE_TYPE { NEG_EDGE=0, POS_EDGE };
+    typedef std::pair<Literal, Literal> Edge;
+    typedef std::pair<Literal, LitVec> MultiEdge;
     typedef std::pair<Edge, EDGE_TYPE> SignedEdge;
+    typedef Clasp::PodVector<MultiEdge>::type GraphType;
     typedef Clasp::PodVector<SignedEdge>::type DetailedGraphType;
 
     class Rule {
     public:
-        VarVec heads;  // Vector<Var>
+        LitVec heads;  // Vector<Var>
         LitVec body;  // Vector<Literal>
-        VarSet atomVars;
+        VarSet vars;
         Rule(const Clasp::Asp::Rule& r);
         bool is_constraint();
     };
@@ -51,8 +51,8 @@ namespace Sysu {
     public:
 
         // constructor parts
-        DependencyGraph(const RuleVec& rules);
-        void reduce (const LitSet& P, const LitSet& N);
+        void add_edge(const Rule& rule);
+        void reduce(const LitSet& P, const LitSet& N);
 
         // construction Answer Set key algos
 
@@ -82,7 +82,7 @@ namespace Sysu {
         bool whole_call_consistent();
 
         // auxiliary functions
-        void print_all_edges();
+        void print();
 
     private:
         GraphType depGraph;

@@ -1643,7 +1643,7 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
             Sysu::Prg* prg = Sysu::Prg::getPrg();
 
 			// prg->doSolve(P, N);
-             prg->print_all_rules();
+             prg->print();
             //------------------
             // End Modification
 

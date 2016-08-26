@@ -26,12 +26,12 @@ namespace Sysu {
     class Prg {
     public:
         // member
-        // DependencyGraph dependencyGraph;
         const Clasp::SymbolTable *symbolTablePtr;
-        RuleVec ruleList;
-        RuleVec constraintList;
-        VarSet atomSet;
-        DetailedGraphType signed_edges;  // 0 - neg edge, 1 - pos edge
+        DependencyGraph dependencyGraph;
+        DetailedGraphType signed_edges;  // [< <Lit, Lit>, 0>, < <Lit, Lit>, 1>, ...] 0 - neg edge, 1 - pos edge
+        RuleVec rules;
+        RuleVec constraints;
+        VarSet atoms;
 
        /* void doSolve(P, N) {
             if (!is_call_consistent(P, N)) {
@@ -91,7 +91,7 @@ namespace Sysu {
         static Prg *getPrg();
         // add/check information
         void add_rule(const Clasp::Asp::Rule& r);
-        void print_all_rules();
+        void print();
     private:
         Prg();
         void print_rules(const RuleVec& rules);
