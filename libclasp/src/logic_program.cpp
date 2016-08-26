@@ -469,9 +469,7 @@ LogicProgram& LogicProgram::addRule(const Rule& r) {
 
 	// SYSU Modification (junhong 16/08/25)
 	//------------------
-	Sysu::Rule* rule = new Sysu::Rule(r);
-	Sysu::Prg* prg = Sysu::Prg::getPrg();
-	prg->rules.push_back(rule);
+	Sysu::Prg::getPrg()->add_rule(new Sysu::Rule(r));
 	//------------------
 	// End Modification
 

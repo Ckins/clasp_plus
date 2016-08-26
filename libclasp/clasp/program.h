@@ -12,6 +12,7 @@
  */
 #include <clasp/logic_program.h>
 #include <set>
+#include <stack>
 
 namespace Sysu {
 
@@ -28,30 +29,35 @@ namespace Sysu {
     public:
         Clasp::VarVec heads;
         Clasp::WeightLitVec body;
-        Rule(const Clasp::Asp::Rule& r) {
-            heads = r.heads;
-            body = r.body;
-        }
+        Rule(const Clasp::Asp::Rule& r);
     };
-
-    // typedef Clasp::Asp::Rule Rule;
+    typedef Clasp::Var Var;
     typedef Clasp::Literal Literal;
-    typedef Clasp::PodVector<Rule*>::type RuleList;
+    typedef Clasp::PodVector List;
+    typedef List<Rule*>::type RuleList;
     typedef std::set<Literal> AtomSet;
     typedef AtomSet SCC;
+    typedef std::pair<Var, Var> Edge;
 
     class DependencyGraph {
-    private:
-        std::map<Literal, AtomSet> dpg;
-        std::vector<SCC> SCCs;
-
-        // function
-        void tarjan();
-        void dfs(SCC scc, int v, AtomSet J, AtomSet K, int mark);
     public:
         DependencyGraph();
-        DependencyGraph(const RuleList& rl);
-        std::pair<AtomSet, AtomSet> call_consistent(SCC scc);
+        DependencyGraph(const RuleList& rules);
+        std::pair<bool, std::pair<AtomSet, AtomSet> > call_consistent(SCC scc);
+    private:
+        std::map<Var, AtomSet> depGraph;
+        std::map<Edge, bool> edgeType;  // 0 - neg edge, 1 - pos edge
+        List<SCC> SCCs;
+        //targan
+        void tarjan();
+        bool *visited;
+        bool *involved;
+        int *DFN;
+        int *LOW;
+        int Index;
+        std::stack<int> path;
+        // methods
+        void dfs(SCC scc, int v, AtomSet J, AtomSet K, int mark);
     };
 
 
@@ -66,7 +72,7 @@ namespace Sysu {
     class Prg {
     public:
         // member
-        DependencyGraph *dependencyGraph;
+        DependencyGraph dependencyGraph;
         const Clasp::SymbolTable *symbolTablePtr;
         RuleList rules;
         AtomSet atomSet;
@@ -118,11 +124,13 @@ namespace Sysu {
         void reduce_with_assignment();
 
         // auxiliary function
-        static Prg* getPrg();
-        // check information
+        static Prg *getPrg();
+        // add/check information
+        void add_rule(Rule* rule);
         void print_all_rules();
     private:
         Prg();
+        ~Prg();
     };
 }
 
