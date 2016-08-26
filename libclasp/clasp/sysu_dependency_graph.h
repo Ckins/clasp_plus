@@ -25,27 +25,34 @@ namespace Sysu {
 
     typedef Clasp::Var Var;
     typedef Clasp::Literal Literal;
-    typedef std::set<Literal> AtomSet;
-    typedef AtomSet SCC;
+    typedef Clasp::VarVec VarVec;
+    typedef Clasp::LitVec LitVec;
+    typedef std::set<Var> VarSet;
+    typedef std::set<Literal> LitSet;
+    typedef LitSet SCC;
     typedef std::pair<Var, Var> Edge;
-    typedef std::pair<Edge, bool> EdgeType;
-    typedef std::pair<Var, AtomSet> MultiEdge;
-    typedef std::map<Var, AtomSet> depGraphType;
+    typedef std::pair<Var, LitVec> MultiEdge;
+    typedef Clasp::PodVector<MultiEdge>::type GraphType;
+    enum EDGE_TYPE { NEG_EDGE=0, POS_EDGE };
+    typedef std::pair<Edge, EDGE_TYPE> SignedEdge;
+    typedef Clasp::PodVector<SignedEdge>::type DetailedGraphType;
 
     class Rule {
     public:
-        Clasp::VarVec heads;  // Vector<Var>
-        AtomSet body;  // Vector<Literal>
+        VarVec heads;  // Vector<Var>
+        LitVec body;  // Vector<Literal>
+        VarSet atomVars;
         Rule(const Clasp::Asp::Rule& r);
+        bool is_constraint();
     };
-    typedef Clasp::PodVector<Rule>::type RuleList;
+    typedef Clasp::PodVector<Rule>::type RuleVec;
 
     class DependencyGraph {
     public:
 
         // constructor parts
-        DependencyGraph(const RuleList& rules);
-        void reduce (const AtomSet& P, const AtomSet& N);
+        DependencyGraph(const RuleVec& rules);
+        void reduce (const LitSet& P, const LitSet& N);
 
         // construction Answer Set key algos
 
@@ -71,16 +78,15 @@ namespace Sysu {
          * (P, N) can NOT be expanded to an AS.
          */
         Clasp::PodVector<SCC> checkSCC();
-        std::pair<bool, std::pair<AtomSet, AtomSet> > call_consistent(SCC scc);
+        std::pair<bool, std::pair<LitSet, LitSet> > call_consistent(SCC scc);
         bool whole_call_consistent();
 
         // auxiliary functions
         void print_all_edges();
 
     private:
-        std::map<Var, AtomSet> depGraph;
-        std::map<Edge, bool> edges;  // 0 - neg edge, 1 - pos edge
-        Clasp::PodVector<SCC> SCCs;
+        GraphType depGraph;
+        Clasp::PodVector<SCC>::type SCCs;
         //targan
         void tarjan();
         bool *visited;
@@ -90,7 +96,7 @@ namespace Sysu {
         int Index;
         std::stack<int> path;
         // methods
-        void dfs(SCC scc, int v, AtomSet J, AtomSet K, int mark);
+        void dfs(SCC scc, int v, LitSet J, LitSet K, int mark);
     };
 }
 

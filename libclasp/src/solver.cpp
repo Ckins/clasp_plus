@@ -1701,8 +1701,8 @@ void Solver::printAssignment() {
 }
 
 void Solver::call_consistent_check() {
-	Sysu::AtomSet P;
-	Sysu::AtomSet N;
+	Sysu::LitSet P;
+	Sysu::LitSet N;
 	Sysu::Prg* prg = Sysu::Prg::getPrg();
 
 	// travelsal the symbol table to get the partial assignment

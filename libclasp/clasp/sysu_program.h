@@ -28,8 +28,10 @@ namespace Sysu {
         // member
         // DependencyGraph dependencyGraph;
         const Clasp::SymbolTable *symbolTablePtr;
-        RuleList rules;
-        AtomSet atomSet;
+        RuleVec ruleList;
+        RuleVec constraintList;
+        VarSet atomSet;
+        DetailedGraphType signed_edges;  // 0 - neg edge, 1 - pos edge
 
        /* void doSolve(P, N) {
             if (!is_call_consistent(P, N)) {
@@ -77,7 +79,7 @@ namespace Sysu {
         */
         // void reduce_with_assignment();
 
-        void do_solve(const AtomSet& P, const AtomSet& N);
+        void do_solve(const LitSet& P, const LitSet& N);
 
 
         /*
@@ -92,6 +94,7 @@ namespace Sysu {
         void print_all_rules();
     private:
         Prg();
+        void print_rules(const RuleVec& rules);
     };
 }
 
