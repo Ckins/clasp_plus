@@ -79,6 +79,12 @@ namespace Sysu {
 
         void do_solve(const AtomSet& P, const AtomSet& N);
 
+
+        /*
+         * check whether the assignment violate constraints
+         */
+        void check_constraint();
+
         // auxiliary function
         static Prg *getPrg();
         // add/check information

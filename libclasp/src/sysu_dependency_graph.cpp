@@ -50,4 +50,6 @@ namespace Sysu {
     std::pair<bool, std::pair<AtomSet, AtomSet> > DependencyGraph::call_consistent(SCC scc) {
 
     };
+
+    bool DependencyGraph::whole_call_consistent() { }
 }
