@@ -36,8 +36,24 @@ namespace Sysu {
         }
         vertices.insert(rule.vars.begin(), rule.vars.end());
     }
+    void DependencyGraph::reduce(const LitSet& P, const LitSet& N) {
+        // TODO: 16-08-27
+        for (GraphType::iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {
+            if (N.find(edge_it->first) != N.end()) {  // delete head[edge_it->first]
+                edge_it->first.watch();
+            } else {
+                for (LitVec::iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {
+
+                }
+            }
+        }
+    }
     void DependencyGraph::resume() {
-        for (GraphType::const_iterator r_it = graph_.begin(); r_it != graph_.end(); ++r_it) {
+        for (GraphType::iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {
+            edge_it->first.clearWatch();  // clear head
+            for (LitVec::iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {
+                w_it->clearWatch();
+            }
         }
     }
     SCCVec DependencyGraph::check_SCCs() {
@@ -46,9 +62,8 @@ namespace Sysu {
         SCCs.clear();
         tarjan_index = 0;
         tarjan_stack.clear();
-        vertices_num = vertices.size() * 2;
-        DFN = new int[vertices_num]();
-        LOW = new int[vertices_num]();
+        DFN = new int[vertices.size()+10]();
+        LOW = new int[vertices.size()+10]();
         Literal v;
         // start
         for (GraphType::const_iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {
@@ -91,18 +106,53 @@ namespace Sysu {
             SCCs.push_back(scc);
         }
     }
-    void DependencyGraph::dfs(SCC scc, int v, LitSet J, LitSet K, int mark) {
-
+    void DependencyGraph::call_consistent_dfs(const SCC& scc, const Literal& v, LitSet& J, LitSet& K, int mark) {
+        if (mark) {
+            J.insert(v);
+        } else {
+            K.insert(v);
+        }
+        DetailedGraphType::const_iterator it;
+        for (LitSet::const_iterator w_it = scc.begin(); w_it != scc.end(); ++w_it) { // v -> w
+            it = signed_edges_ptr->find(SimpleEdge(v.var(), w_it->var()));
+            if (it != signed_edges_ptr->end() && J.find(*w_it) == J.end() && K.find(*w_it) == K.end()) {
+                call_consistent_dfs(scc, *w_it, J, K, it->second == POS_EDGE ? mark : !mark);
+            }
+        }
     }
-    std::pair<bool, std::pair<LitSet, LitSet> > DependencyGraph::call_consistent(SCC scc) {
-
+    std::pair<bool, LitSetPair> DependencyGraph::call_consistent(const SCC& scc) {
+        LitSet J, K;
+        Literal v = *scc.begin();
+        DetailedGraphType::const_iterator it;
+        call_consistent_dfs(scc, v, J, K, false);
+        bool p_in_J, q_in_J, pq_in_J, pq_in_K;  // !p_in_J implies p_in_K
+        for (LitSet::const_iterator p_it = scc.begin(); p_it != scc.end(); ++p_it) {
+            for (LitSet::const_iterator q_it = scc.begin(); q_it != scc.end(); ++q_it) { // p->q
+                it = signed_edges_ptr->find(SimpleEdge(p_it->var(), q_it->var()));
+                if (it != signed_edges_ptr->end()) {  // find p->q in graph
+                    p_in_J = J.find(*p_it) != J.end();
+                    q_in_J = J.find(*q_it) != J.end();
+                    pq_in_J = p_in_J && q_in_J;
+                    pq_in_K = !p_in_J && !q_in_J;
+                    if ((it->second == POS_EDGE && (!pq_in_J && !pq_in_K))
+                        || (it->second == NEG_EDGE && (pq_in_J || pq_in_K))) {
+                        return std::pair<bool, LitSetPair>(false, LitSetPair(J, K));
+                    }
+                }
+            }
+        }
+        return std::pair<bool, LitSetPair>(true, LitSetPair(J, K));
     };
-
     bool DependencyGraph::whole_call_consistent() {
-
+        for (SCCVec::const_iterator scc_it = SCCs.begin(); scc_it != SCCs.end(); ++scc_it) {
+            if (!call_consistent(*scc_it).first) {
+                return false;
+            }
+        }
+        return true;
     }
     void DependencyGraph::print_SCC(const SCC& scc) {
-        std::cout << "Strong Connected Component: ";
+        std::cout << "Strongly Connected Component: ";
         for (LitSet::const_iterator it = scc.begin(); it != scc.end(); ++it) {
             std::cout << it->var() << " ";
         }

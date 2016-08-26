@@ -25,12 +25,14 @@ namespace Sysu {
         for (LitVec::const_iterator h_it = rule.heads.begin(); h_it != rule.heads.end(); ++h_it) {
             for (LitVec::const_iterator b_it = rule.body.begin(); b_it != rule.body.end(); ++b_it) {
                 if (b_it->sign()) {
-                    signed_edges.push_back(SignedEdge(Edge(*h_it, *b_it), NEG_EDGE));
+                    signed_edges.insert(SignedEdge(SimpleEdge(h_it->var(), b_it->var()), NEG_EDGE));
                 } else {
-                    signed_edges.push_back(SignedEdge(Edge(*h_it, *b_it), POS_EDGE));
+                    signed_edges.insert(SignedEdge(SimpleEdge(h_it->var(), b_it->var()), POS_EDGE));
                 }
             }
         }
+        // Expose signed edges table to dependency graph
+        dependencyGraph.signed_edges_ptr = &signed_edges;
     }
 
     void Prg::do_solve(const LitSet &P, const LitSet &N) {
@@ -87,5 +89,6 @@ namespace Sysu {
         std::cout << "---Constraints---" << std::endl;
         print_rules(constraints);
         std::cout << "---End---" << std::endl;
+        std::cout << "Call Consistent: " << dependencyGraph.whole_call_consistent() << std:: endl;
     }
 }

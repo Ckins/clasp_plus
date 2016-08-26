@@ -29,13 +29,15 @@ namespace Sysu {
     typedef std::set<Var> VarSet;
     typedef std::set<Literal> LitSet;
     typedef LitSet SCC;
+    typedef std::pair<LitSet, LitSet> LitSetPair;
     typedef Clasp::PodVector<SCC>::type SCCVec;
     enum EDGE_TYPE { NEG_EDGE, POS_EDGE };
+    typedef std::pair<Var, Var> SimpleEdge;
     typedef std::pair<Literal, Literal> Edge;
     typedef std::pair<Literal, LitVec> MultiEdge;
-    typedef std::pair<Edge, EDGE_TYPE> SignedEdge;
     typedef Clasp::PodVector<MultiEdge>::type GraphType;
-    typedef Clasp::PodVector<SignedEdge>::type DetailedGraphType;
+    typedef std::pair<SimpleEdge, EDGE_TYPE> SignedEdge;
+    typedef std::map<SimpleEdge, EDGE_TYPE > DetailedGraphType;
 
     class Rule {
     public:
@@ -49,6 +51,7 @@ namespace Sysu {
 
     class DependencyGraph {
     public:
+        const DetailedGraphType* signed_edges_ptr;
 
         // constructor parts
         void add_edge(const Rule& rule);
@@ -73,13 +76,18 @@ namespace Sysu {
          */
         void W_expand();
 
+        /*
+         * Update internal SCCs and Return a copy of it.
+         */
         SCCVec find_SCCs();
+
         /*
          * check whether we should continue
          * if the dg under (P, N) is not call-consistent,
          * (P, N) can NOT be expanded to an AS.
          */
         SCCVec check_SCCs();
+
         bool whole_call_consistent();
 
         // auxiliary functions
@@ -89,7 +97,6 @@ namespace Sysu {
         GraphType graph_;
         SCCVec SCCs;
         VarSet vertices;
-        int vertices_num;
         //targan
         void tarjan(const Literal& v);
         int* DFN;
@@ -97,8 +104,8 @@ namespace Sysu {
         int tarjan_index;
         LitVec tarjan_stack;
         // methods
-        std::pair<bool, std::pair<LitSet, LitSet> > call_consistent(SCC scc);
-        void dfs(SCC scc, int v, LitSet J, LitSet K, int mark);
+        std::pair<bool, LitSetPair> call_consistent(const SCC& scc);
+        void call_consistent_dfs(const SCC& scc, const Literal& v, LitSet& J, LitSet& K, int mark);
         void print_SCC(const SCC& scc);
     };
 }
