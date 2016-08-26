@@ -29,7 +29,7 @@ namespace Sysu {
     class Rule {
     public:
         Clasp::VarVec heads;  // Vector<Var>
-        Clasp::WeightLitVec body;  // Vector<Literal>
+        AtomSet body;  // Vector<Literal>
         Rule(const Clasp::Asp::Rule& r);
     };
     typedef Clasp::PodVector<Rule>::type RuleList;
