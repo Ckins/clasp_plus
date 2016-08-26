@@ -26,7 +26,7 @@ namespace Sysu {
     class Prg {
     public:
         // member
-        DependencyGraph dependencyGraph;
+        // DependencyGraph dependencyGraph;
         const Clasp::SymbolTable *symbolTablePtr;
         RuleList rules;
         AtomSet atomSet;

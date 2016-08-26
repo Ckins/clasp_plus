@@ -6,6 +6,8 @@
 
 namespace Sysu {
 
+    Prg::Prg() { }
+
     Prg* Prg::getPrg() {
         static Prg prg;
         return &prg;
