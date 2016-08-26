@@ -16,7 +16,16 @@ namespace Sysu {
         rules.push_back(Rule(r));
     }
 
-    void Prg::do_solve(const AtomSet &P, const AtomSet &N) { }
+    void Prg::do_solve(const AtomSet &P, const AtomSet &N) {
+
+        DependencyGraph dg(rules);
+        // dg.reduce(P, N);
+
+        if (dg.whole_call_consistent()) {
+
+        }
+
+    }
 
     void Prg::print_all_rules() {
         std::cout << "---Rules---" << std::endl;

@@ -9,6 +9,12 @@
  * \file
  * namespace sysu
  * Contains the definition of the class program and related classes.
+ *
+ * tarjian algorithm
+ *
+ * call-consistent whole graph check algo
+ *
+ * T-algo and unfounded algo and w-expand are all implement internally
  */
 #include <clasp/logic_program.h>
 #include <set>
@@ -41,6 +47,15 @@ namespace Sysu {
         Clasp::PodVector<SCC> checkSCC();
         std::pair<bool, std::pair<AtomSet, AtomSet> > call_consistent(SCC scc);
         void print_all_edges();
+
+
+        /*
+         * check whether we should continue
+         * if the dg under (P, N) is not call-consistent,
+         * (P, N) can NOT be expanded to an AS.
+         */
+        bool whole_call_consistent();
+
     private:
         std::map<Var, AtomSet> depGraph;
         std::map<Edge, bool> edges;  // 0 - neg edge, 1 - pos edge

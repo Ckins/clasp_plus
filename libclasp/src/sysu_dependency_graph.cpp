@@ -12,7 +12,6 @@ namespace Sysu {
 
     DependencyGraph::DependencyGraph(const RuleList &rules) {
         for (RuleList::const_iterator r_it = rules.begin(); r_it != rules.end(); ++r_it) {
-
             for (Clasp::VarVec::const_iterator h_it = r_it->heads.begin(); h_it != r_it->heads.end(); ++h_it) {
                 Var headVar = *h_it;
                 AtomSet bodySet;
@@ -51,4 +50,6 @@ namespace Sysu {
     std::pair<bool, std::pair<AtomSet, AtomSet> > DependencyGraph::call_consistent(SCC scc) {
 
     };
+
+    bool DependencyGraph::whole_call_consistent() { }
 }
