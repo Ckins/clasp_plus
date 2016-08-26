@@ -53,7 +53,7 @@ namespace Sysu {
         // start
         for (GraphType::const_iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {
             v = edge_it->first;
-            if (!v.watched() && DFN[v.var()] <= 0) {  // still in graph & not visited by tarjan
+            if (!v.watched() && DFN[v.var()] <= 0) {  // w is still in graph & not visited by tarjan
                 tarjan(v);
             }
         }
@@ -68,11 +68,9 @@ namespace Sysu {
         Literal w;  // v -> w
         for (GraphType::const_iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {
             if (edge_it->first.var() == v.var()) {
-                for (LitVec::const_iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {
+                for (LitVec::const_iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {  // v -> w
                     w = *w_it;
-                    if (!w.watched()) {  // still in graph
-                        for (LitVec::const_iterator it = tarjan_stack.begin(); it != tarjan_stack.end(); ++it) {
-                        }
+                    if (!w.watched()) {  // w is still in graph
                         if (DFN[w.var()] <= 0) {  // not visited by tarjan
                             tarjan(w);
                             LOW[v.var()] = min(LOW[v.var()], LOW[w.var()]);
