@@ -18,7 +18,6 @@
  */
 #include <clasp/logic_program.h>
 #include <set>
-#include <stack>
 #include <iostream>
 
 namespace Sysu {
@@ -31,7 +30,7 @@ namespace Sysu {
     typedef std::set<Literal> LitSet;
     typedef LitSet SCC;
     typedef Clasp::PodVector<SCC>::type SCCVec;
-    enum EDGE_TYPE { NEG_EDGE=0, POS_EDGE };
+    enum EDGE_TYPE { NEG_EDGE, POS_EDGE };
     typedef std::pair<Literal, Literal> Edge;
     typedef std::pair<Literal, LitVec> MultiEdge;
     typedef std::pair<Edge, EDGE_TYPE> SignedEdge;
@@ -74,33 +73,33 @@ namespace Sysu {
          */
         void W_expand();
 
-        SCCVec getSCCs();
+        SCCVec find_SCCs();
         /*
          * check whether we should continue
          * if the dg under (P, N) is not call-consistent,
          * (P, N) can NOT be expanded to an AS.
          */
-        SCCVec checkSCCs();
+        SCCVec check_SCCs();
         bool whole_call_consistent();
 
         // auxiliary functions
-        void print();
-
+        void print_graph();
+        void print_SCCs();
     private:
         GraphType graph_;
         SCCVec SCCs;
         VarSet vertices;
+        int vertices_num;
         //targan
         void tarjan(const Literal& v);
-        bool *visited;
-        bool *involved;
-        std::map<Literal, int> DFN;
-        std::map<Literal, int> LOW;
-        int index;
-        std::stack<int> path;
+        int* DFN;
+        int* LOW;
+        int tarjan_index;
+        LitVec tarjan_stack;
         // methods
         std::pair<bool, std::pair<LitSet, LitSet> > call_consistent(SCC scc);
         void dfs(SCC scc, int v, LitSet J, LitSet K, int mark);
+        void print_SCC(const SCC& scc);
     };
 }
 

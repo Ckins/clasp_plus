@@ -6,6 +6,16 @@
 
 namespace Sysu {
 
+    int min(int a, int b) {
+        return a <= b ? a : b;
+    }
+    bool find_var(const LitVec& list, const Literal& item) {
+        for (LitVec::const_iterator it = list.begin(); it != list.end(); ++it)
+            if (it->var() == item.var())
+                return true;
+        return false;
+    }
+
     Rule::Rule(const Clasp::Asp::Rule &r) {
         for (Clasp::VarVec::const_iterator it = r.heads.begin(); it != r.heads.end(); ++it) {
             vars.insert(*it);
@@ -30,20 +40,58 @@ namespace Sysu {
         for (GraphType::const_iterator r_it = graph_.begin(); r_it != graph_.end(); ++r_it) {
         }
     }
-    SCCVec DependencyGraph::checkSCCs() {
+    SCCVec DependencyGraph::check_SCCs() {
     }
-    SCCVec DependencyGraph::getSCCs() {
+    SCCVec DependencyGraph::find_SCCs() {
         SCCs.clear();
-        Literal v, w;  // v -> w;
+        tarjan_index = 0;
+        tarjan_stack.clear();
+        vertices_num = vertices.size() * 2;
+        DFN = new int[vertices_num]();
+        LOW = new int[vertices_num]();
+        Literal v;
+        // start
         for (GraphType::const_iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {
             v = edge_it->first;
-            if (!v.watched() && DFN.find(v) == DFN.end()) {  // still in graph
+            if (!v.watched() && DFN[v.var()] <= 0) {  // still in graph & not visited by tarjan
                 tarjan(v);
             }
         }
+        // end
+        delete[] DFN;
+        delete[] LOW;
+        return SCCs;
     }
     void DependencyGraph::tarjan(const Literal& v) {
-
+        DFN[v.var()] = LOW[v.var()] = ++tarjan_index;  // initial visiting mark
+        tarjan_stack.push_back(v);
+        Literal w;  // v -> w
+        for (GraphType::const_iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {
+            if (edge_it->first.var() == v.var()) {
+                for (LitVec::const_iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {
+                    w = *w_it;
+                    if (!w.watched()) {  // still in graph
+                        for (LitVec::const_iterator it = tarjan_stack.begin(); it != tarjan_stack.end(); ++it) {
+                        }
+                        if (DFN[w.var()] <= 0) {  // not visited by tarjan
+                            tarjan(w);
+                            LOW[v.var()] = min(LOW[v.var()], LOW[w.var()]);
+                        } else if (find_var(tarjan_stack, w)) {  // in stack
+                            LOW[v.var()] = min(LOW[v.var()], DFN[w.var()]);
+                        }
+                    }
+                }
+            }
+        }
+        if (LOW[v.var()] == DFN[v.var()]) {
+            SCC scc;
+            do {
+                w = tarjan_stack.back();
+                scc.insert(w);
+                tarjan_stack.pop_back();
+            } while (w.var() != v.var());
+            SCCs.push_back(scc);
+        }
     }
     void DependencyGraph::dfs(SCC scc, int v, LitSet J, LitSet K, int mark) {
 
@@ -55,7 +103,20 @@ namespace Sysu {
     bool DependencyGraph::whole_call_consistent() {
 
     }
-    void DependencyGraph::print() {
+    void DependencyGraph::print_SCC(const SCC& scc) {
+        std::cout << "Strong Connected Component: ";
+        for (LitSet::const_iterator it = scc.begin(); it != scc.end(); ++it) {
+            std::cout << it->var() << " ";
+        }
+        std::cout << std::endl;
+    }
+    void DependencyGraph::print_SCCs() {
+        find_SCCs();
+        for (SCCVec::const_iterator it = SCCs.begin(); it != SCCs.end(); ++it) {
+            print_SCC(*it);
+        }
+    }
+    void DependencyGraph::print_graph() {
         std::cout << "---Dependency Graph---" << std::endl;
         for (GraphType::const_iterator r_it = graph_.begin(); r_it != graph_.end(); ++r_it) {
             std::cout << r_it->first.var() << " -> ";

@@ -1643,7 +1643,8 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
             Sysu::Prg* prg = Sysu::Prg::getPrg();
 
 			// prg->doSolve(P, N);
-             prg->print();
+			prg->print();
+			prg->dependencyGraph.print_SCCs();
             //------------------
             // End Modification
 

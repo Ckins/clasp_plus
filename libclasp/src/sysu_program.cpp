@@ -82,11 +82,10 @@ namespace Sysu {
     }
 
     void Prg::print() {
-        dependencyGraph.print();
         std::cout << "---Normal Rules & Facts---" << std::endl;
         print_rules(rules);
         std::cout << "---Constraints---" << std::endl;
         print_rules(constraints);
-        std::cout << "---End---\n" << std::endl;
+        std::cout << "---End---" << std::endl;
     }
 }
