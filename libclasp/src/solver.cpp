@@ -1715,6 +1715,17 @@ void Solver::call_consistent_check() {
 			N.insert(it->second.lit);
 		}
 	}
+
+	/*
+	for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
+		if (assign_.value(it->second.lit.var()) == value_true) {
+			P.insert(it->second.lit.var());
+		}
+		if (assign_.value(it->second.lit.var()) == value_false) {
+			N.insert(it->second.lit.var());
+		}
+	}*/
+
 	prg->do_solve(P, N);
 }
 
