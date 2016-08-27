@@ -29,7 +29,7 @@ namespace Sysu {
     typedef std::set<Var> VarSet;
     typedef std::set<Literal> LitSet;
     typedef LitSet SCC;
-    typedef std::pair<LitSet, LitSet> LitSetPair;
+    typedef std::pair<VarSet, VarSet> VarSetPair;
     typedef Clasp::PodVector<SCC>::type SCCVec;
     enum EDGE_TYPE { NEG_EDGE, POS_EDGE };
     typedef std::pair<Var, Var> SimpleEdge;
@@ -55,7 +55,7 @@ namespace Sysu {
 
         // constructor parts
         void add_edge(const Rule& rule);
-        void reduce(const LitSet& P, const LitSet& N);
+        void reduce(const VarSet& P, const VarSet& N);
         void resume();
 
         // construction Answer Set key algos
@@ -64,8 +64,8 @@ namespace Sysu {
          * Input : (P, N)
          * Ouput : (P', N')
          */
-        void T_once();
-        void T_inf();
+        VarSetPair T_once(const VarSet& P, const VarSet& N);
+        VarSetPair T_inf(const VarSet& P, const VarSet& N);
 
         // unknown todo
         void W_once();
@@ -104,8 +104,8 @@ namespace Sysu {
         int tarjan_index;
         LitVec tarjan_stack;
         // methods
-        std::pair<bool, LitSetPair> call_consistent(const SCC& scc);
-        void call_consistent_dfs(const SCC& scc, const Literal& v, LitSet& J, LitSet& K, int mark);
+        std::pair<bool, VarSetPair> call_consistent(const SCC& scc);
+        void call_consistent_dfs(const SCC& scc, const Var& v, VarSet& J, VarSet& K, int mark);
         void print_SCC(const SCC& scc);
     };
 }

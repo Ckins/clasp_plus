@@ -36,17 +36,111 @@ namespace Sysu {
         }
         vertices.insert(rule.vars.begin(), rule.vars.end());
     }
-    void DependencyGraph::reduce(const LitSet& P, const LitSet& N) {
-        // TODO: 16-08-27
-        for (GraphType::iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {
-            if (N.find(edge_it->first) != N.end()) {  // delete head[edge_it->first]
-                edge_it->first.watch();
-            } else {
-                for (LitVec::iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {
-
+    void DependencyGraph::reduce(const VarSet& P, const VarSet& N) {
+        // use Log(n) for assignment check
+        std::map<Var, bool> assign;
+        std::map<Var, bool>::const_iterator a_it;
+        for(VarSet::const_iterator it = P.begin(); it != P.end(); ++it) {
+            assign[*it] = true;
+        }
+        for(VarSet::const_iterator it = N.begin(); it != N.end(); ++it) {
+            assign[*it] = false;
+        }
+        // reduce
+        for (GraphType::iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {  // v: edge_it->first
+            // check rule body
+            for (LitVec::iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {  // w: w_it
+                a_it = assign.find(w_it->var());
+                if (a_it != assign.end()) {  // assigned
+                    if (a_it->second) {  // w is true, Literal(w) uncertain
+                        if (w_it->sign()) {  // (not w) - Literal is false
+                            edge_it->first.watch();  // remove edge by removing head
+                            break;  // no need to check rest
+                        } else {  // w - Literal is true
+                            w_it->watch();  // remove body literal
+                        }
+                    } else {
+                        if (w_it->sign()) {  // (not w) - Literal is true
+                            w_it->watch();  // remove body literal
+                        } else {  // w - Literal is false
+                            edge_it->first.watch();  // remove edge by removing head
+                            break;  // no need to check rest
+                        }
+                    }
                 }
             }
         }
+    }
+    VarSetPair DependencyGraph::T_once(const VarSet& P, const VarSet& N) {
+        // use Log(n) for assignment check
+        std::map<Var, bool> assign;
+        std::map<Var, bool>::const_iterator a_it;
+        for(VarSet::const_iterator it = P.begin(); it != P.end(); ++it) {
+            assign[*it] = true;
+        }
+        for(VarSet::const_iterator it = N.begin(); it != N.end(); ++it) {
+            assign[*it] = false;
+        }
+        // check rule statisfaction
+        VarSet P1, N1;
+        int rule_satisfication;  // -1 - rule is false, 0 - rule unknown, 1 - rule is true
+        for (GraphType::iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {  // v: edge_it->first
+            rule_satisfication = 1;
+            // check rule body
+            for (LitVec::iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {  // w: w_it
+                a_it = assign.find(w_it->var());
+                if (a_it != assign.end()) {  // assigned
+                    if (a_it->second) {  // w is true, Literal(w) uncertain
+                        if (w_it->sign()) {  // (not w) - Literal is false
+                            rule_satisfication = -1;
+                        } else {  // w - Literal is true
+                            // check next w
+                        }
+                    } else {
+                        if (w_it->sign()) {  // (not w) - Literal is true
+                            // check next w
+                        } else {  // w - Literal is false
+                            rule_satisfication = -1;
+                        }
+                    }
+                } else {
+                    rule_satisfication = 0;
+                }
+            }
+            if (rule_satisfication == 1) { P1.insert(edge_it->first.var()); }
+            else if (rule_satisfication == -1) { N1.insert(edge_it->first.var()); }
+        }
+        return VarSetPair(P1, N1);
+    }
+    VarSetPair DependencyGraph::T_inf(const VarSet& P, const VarSet& N) {
+        unsigned long iterations = vertices.size();  // vertices.size() - P.size() - N.size();
+        VarSetPair P_N = VarSetPair(P, N), P1_N1;
+        bool reach_fixpoint;
+        VarSet::const_iterator it, it1;
+        while (iterations--) {
+            P1_N1 = T_once(P_N.first, P_N.second);
+            reach_fixpoint = true;
+            if (P_N.first.size() == P1_N1.first.size() && P_N.second.size() == P1_N1.second.size()) {
+                for (it = P_N.first.begin(), it1 = P1_N1.first.begin(); it != P_N.first.end() && it1 != P1_N1.first.end(); ++it, ++it1) {
+                    if (*it != *it1) {
+                        reach_fixpoint = false;
+                    }
+                }
+                for (it = P_N.second.begin(), it1 = P1_N1.second.begin(); it != P_N.second.end() && it1 != P1_N1.second.end(); ++it, ++it1) {
+                    if (*it != *it1) {
+                        reach_fixpoint = false;
+                    }
+                }
+            } else {
+                reach_fixpoint = false;
+            }
+            if (reach_fixpoint) {
+                return P1_N1;
+            } else {
+                P_N = P1_N1;
+            }
+        }
+        // TODO(2016-08-27): if reached maximum iteration, return last P1, N1?
     }
     void DependencyGraph::resume() {
         for (GraphType::iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {
@@ -106,56 +200,55 @@ namespace Sysu {
             SCCs.push_back(scc);
         }
     }
-    std::pair<bool, LitSetPair> DependencyGraph::call_consistent(const SCC& scc) {
-        LitSet J, K;
-        Literal v = *scc.begin();
+    std::pair<bool, VarSetPair> DependencyGraph::call_consistent(const SCC& scc) {
+        VarSet J, K;
+        Var v = scc.begin()->var();
         DetailedGraphType::const_iterator it;
         call_consistent_dfs(scc, v, J, K, false);
-        std::cout << "---call_consistent Call---" << std::endl;
+        std::cout << "---call_consistent Start---" << std::endl;
         print_SCC(scc);
         std::cout << "In J: ";
-        for (LitSet::const_iterator it = J.begin(); it != J.end(); ++it) {
-            std::cout << it->var() << " ";
+        for (VarSet::const_iterator it = J.begin(); it != J.end(); ++it) {
+            std::cout << *it << " ";
         }
         std::cout << std::endl << "In K: ";
-        for (LitSet::const_iterator it = K.begin(); it != K.end(); ++it) {
-            std::cout << it->var() << " ";
+        for (VarSet::const_iterator it = K.begin(); it != K.end(); ++it) {
+            std::cout << *it << " ";
         }
         std::cout << std::endl;
-        std::cout << "---call_consistent End---" << std::endl;
         bool p_in_J, q_in_J, pq_in_J, pq_in_K;  // !p_in_J implies p_in_K
         for (LitSet::const_iterator p_it = scc.begin(); p_it != scc.end(); ++p_it) {
             for (LitSet::const_iterator q_it = scc.begin(); q_it != scc.end(); ++q_it) { // p->q
                 it = signed_edges_ptr->find(SimpleEdge(p_it->var(), q_it->var()));
                 if (it != signed_edges_ptr->end()) {  // find p->q in graph
                     std::cout << p_it->var() << " -> " << q_it->var() << ": " << (it->second == POS_EDGE ? "POS" : "NEG");
-                    p_in_J = J.find(*p_it) != J.end();
-                    q_in_J = J.find(*q_it) != J.end();
+                    p_in_J = J.find(p_it->var()) != J.end();
+                    q_in_J = J.find(q_it->var()) != J.end();
                     pq_in_J = p_in_J && q_in_J;
                     pq_in_K = !p_in_J && !q_in_J;
                     std::cout << ", " << p_it->var() << " in " << (p_in_J ? "J" : "K") << ", " << q_it->var() << " in " << (q_in_J ? "J" : "K") << std::endl;
                     if ((it->second == POS_EDGE && (!pq_in_J && !pq_in_K))
                         || (it->second == NEG_EDGE && (pq_in_J || pq_in_K))) {
                         std::cout << "Call Consistent Fail: " << p_it->var() << " -> " << q_it->var() << std::endl;
-                        return std::pair<bool, LitSetPair>(false, LitSetPair(J, K));
+                        return std::pair<bool, VarSetPair>(false, VarSetPair(J, K));
                     }
                 }
             }
         }
         std::cout << "TRUE" << std::endl;
-        return std::pair<bool, LitSetPair>(true, LitSetPair(J, K));
+        return std::pair<bool, VarSetPair>(true, VarSetPair(J, K));
     };
-    void DependencyGraph::call_consistent_dfs(const SCC& scc, const Literal& v, LitSet& J, LitSet& K, int mark) {
+    void DependencyGraph::call_consistent_dfs(const SCC& scc, const Var& v, VarSet& J, VarSet& K, int mark) {
         if (mark) {
             J.insert(v);
         } else {
             K.insert(v);
         }
         DetailedGraphType::const_iterator it;
-        for (LitSet::const_iterator w_it = scc.begin(); w_it != scc.end(); ++w_it) { // v -> w
-            it = signed_edges_ptr->find(SimpleEdge(v.var(), w_it->var()));
-            if (it != signed_edges_ptr->end() && J.find(*w_it) == J.end() && K.find(*w_it) == K.end()) {
-                call_consistent_dfs(scc, *w_it, J, K, it->second == POS_EDGE ? mark : !mark);
+        for (LitSet::const_iterator w_it = scc.begin(); w_it != scc.end(); ++w_it) {  // v -> w
+            it = signed_edges_ptr->find(SimpleEdge(v, w_it->var()));
+            if (it != signed_edges_ptr->end() && J.find(w_it->var()) == J.end() && K.find(w_it->var()) == K.end()) {
+                call_consistent_dfs(scc, w_it->var(), J, K, it->second == POS_EDGE ? mark : !mark);
             }
         }
     }
