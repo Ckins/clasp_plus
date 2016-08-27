@@ -85,7 +85,7 @@ class Solver {
 	// modified by kinsang - Aug 25
 public:
 	void printAssignment();
-	void call_consistent_check();
+	void call_consistent_construction();
 private:
 	uint32 count_emu_num;
 

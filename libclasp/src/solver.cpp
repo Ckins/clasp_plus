@@ -1648,28 +1648,12 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
             //------------------
             // End Modification
 
-			// Input : (P, N)
-			// Output: AS or continue
-			/*if call-consistent(P, N) {
-
-				if (P, N) == W(P, N) as fixed point{
-					return W-expand(P, N) as AS
-				} else {
-
-					// carefully check the number of steps
-					(P', N') = iterativeW(P, N);
-				}
-
-				if (P', N') call-consitent {
-					return W-expand(P', N') as As
-				}
-			}*/
-
 			// kinsang modification start
 
-			call_consistent_check();
+			call_consistent_construction();
 
-			printAssignment();
+			// printAssignment();
+			// end modification
 
 			if (decideNextBranch(rf)) { conflicts = !propagate(); }
 			else                      { break; }
@@ -1701,11 +1685,16 @@ void Solver::printAssignment() {
 	// end modification
 }
 
-void Solver::call_consistent_check() {
-	Sysu::LitSet P;
-	Sysu::LitSet N;
+void Solver::call_consistent_construction() {
+	Sysu::VarSet P;
+	Sysu::VarSet N;
 	Sysu::Prg* prg = Sysu::Prg::getPrg();
 
+	/* method one with clasp's tricks
+	 *
+	 * 	Sysu::LitSet P;
+	 *  Sysu::LitSet N;
+	 *
 	// travelsal the symbol table to get the partial assignment
 	for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
 		if (assign_.value(it->second.lit.var()) == trueValue(it->second.lit)) {
@@ -1714,9 +1703,9 @@ void Solver::call_consistent_check() {
 		if (assign_.value(it->second.lit.var()) == falseValue(it->second.lit)) {
 			N.insert(it->second.lit);
 		}
-	}
+	}*/
 
-	/*
+
 	for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
 		if (assign_.value(it->second.lit.var()) == value_true) {
 			P.insert(it->second.lit.var());
@@ -1724,7 +1713,7 @@ void Solver::call_consistent_check() {
 		if (assign_.value(it->second.lit.var()) == value_false) {
 			N.insert(it->second.lit.var());
 		}
-	}*/
+	}
 
 	prg->do_solve(P, N);
 }
