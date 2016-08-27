@@ -39,29 +39,86 @@ namespace Sysu {
 
         break_constraint(P, N);
 
-        /*
+        // every reduce the graph find scc automatically
         dependencyGraph.reduce(P, N);
-        dependencyGraph.checkSCC();
 
         if (!dependencyGraph.whole_call_consistent()) {
             return;
         }
 
-        dependencyGraph.W_once(P, N);
+        VarSetPair P_N_1 = dependencyGraph.T_once(P, N);
         // if fixed point
-        dependencyGraph.W_expand();
+
+        if (same_set(P_N_1, VarSetPair(P, N))) {
+            finalize(P_N_1);
+        }
 
         // (p', N') = W.inf(P', N')
+        VarSetPair P_N_star = dependencyGraph.T_inf(P_N_1.first, P_N_1.second);
 
         // if (P', N') is null return;
+        if (empty_set(P_N_star)) return;
 
-        // dg.reduce(p', n')
-        // dg.checkScc()
+        // dg.reduce(p', n') and findScc()
         // if dg.whole_call-consistent, w_expand()
-        */
+
+        dependencyGraph.reduce(P_N_star.first, P_N_star.second);
+        if (dependencyGraph.whole_call_consistent()) {
+            finalize(P_N_star);
+        }
     }
 
-    bool Prg::break_constraint(const VarSet &P, const VarSet &N) { }
+    void Prg::finalize(const VarSetPair &P_N) {
+        VarSetPair result = dependencyGraph.T_expand(P_N.first, P_N.second);
+        report_answer(result.first);
+    }
+
+    void Prg::report_answer(const VarSet &P) {
+        // todo traversal and print the answer
+        std::cout << "We construct an answer set!" << std::endl;
+        // std::cout << P.size() << std::endl;
+        VarSet::iterator it = P.begin();
+
+        for (; it != P.end(); it++) std::cout << *it << " ";
+        std::cout << std::endl;
+        /*for (Clasp::SymbolTable::const_iterator it = symbolTablePtr->begin(); it != symbolTablePtr->end(); ++it) {
+
+            std::cout << (*it).second.lit.var() << std::endl;
+            /*if (P.find(it->second.lit.var()) != P.end()) {
+                std::cout << "true:" << it->second.name.c_str() << std::endl;
+            }
+        }*/
+    }
+
+    bool Prg::same_set(const VarSetPair &P_N, const VarSetPair &P_N_2) {
+        //
+        if (P_N.first.size() != P_N.first.size()
+                || P_N_2.second.size() != P_N_2.second.size()) return false;
+
+        // check P
+        VarSet::const_iterator it = P_N.first.begin();
+        for (; it != P_N.first.end(); it++) {
+            if (P_N_2.first.find(*it) == P_N_2.first.end()) return false;
+        }
+
+        // check N
+        VarSet::const_iterator n_it = P_N.second.begin();
+        for (; n_it != P_N.second.end(); n_it++) {
+            if (P_N_2.second.find(*n_it) == P_N_2.second.end()) return false;
+        }
+        // both P N are the same.
+        return true;
+    }
+
+    bool Prg::empty_set(const VarSetPair &P_N) {
+        return (P_N.first.size() == 0 && P_N.second.size() == 0);
+    }
+
+    bool Prg::break_constraint(const VarSet &P, const VarSet &N) {
+
+        // todo check constraint
+        return true;
+    }
 
     void Prg::print_rules(const RuleVec& l) {
         int first_term;
