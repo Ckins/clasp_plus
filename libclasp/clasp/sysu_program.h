@@ -37,12 +37,12 @@ namespace Sysu {
          * Output : Print the answer set or return to clasp
         */
 
-        void do_solve(const LitSet& P, const LitSet& N);
+        void do_solve(const VarSet& P, const VarSet& N);
 
         /*
          * check whether the assignment violate constraints
          */
-        bool break_constraint(const LitSet &P, const LitSet &N);
+        bool break_constraint(const VarSet &P, const VarSet &N);
 
         // auxiliary function
         static Prg *getPrg();

@@ -35,7 +35,7 @@ namespace Sysu {
         dependencyGraph.signed_edges_ptr = &signed_edges;
     }
 
-    void Prg::do_solve(const LitSet &P, const LitSet &N) {
+    void Prg::do_solve(const VarSet &P, const VarSet &N) {
 
         break_constraint(P, N);
 
@@ -61,7 +61,7 @@ namespace Sysu {
         */
     }
 
-    bool Prg::break_constraint(const LitSet &P, const LitSet &N) { }
+    bool Prg::break_constraint(const VarSet &P, const VarSet &N) { }
 
     void Prg::print_rules(const RuleVec& l) {
         int first_term;
