@@ -36,7 +36,7 @@ namespace Sysu {
     }
 
     void Prg::do_solve(const VarSet &P, const VarSet &N) {
-
+        dependencyGraph.resume();
         break_constraint(P, N);
 
         // every reduce the graph find scc automatically
@@ -142,12 +142,10 @@ namespace Sysu {
     }
 
     void Prg::print() {
-        dependencyGraph.T_expand(VarSet(), VarSet());
         std::cout << "---Normal Rules & Facts---" << std::endl;
         print_rules(rules);
         std::cout << "---Constraints---" << std::endl;
         print_rules(constraints);
         std::cout << "---End---" << std::endl;
-        std::cout << "Call Consistent: \n" << dependencyGraph.whole_call_consistent() << std:: endl;
     }
 }

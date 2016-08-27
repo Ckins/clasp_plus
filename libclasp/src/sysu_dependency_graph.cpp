@@ -238,7 +238,7 @@ namespace Sysu {
         VarSet J, K;
         Var v = scc.begin()->var();
         call_consistent_dfs(scc, v, J, K, false);
-        std::cout << "---call_consistent Start---" << std::endl;
+        std::cout << "---call_consistent---" << std::endl;
         print_SCC(scc);
         std::cout << "In J: ";
         for (VarSet::const_iterator it = J.begin(); it != J.end(); ++it) {
@@ -287,7 +287,6 @@ namespace Sysu {
     }
     bool DependencyGraph::whole_call_consistent() {
         find_SCCs();
-        std::cout << "Size: " << SCCs.size() << std::endl;
         for (SCCVec::const_iterator scc_it = SCCs.begin(); scc_it != SCCs.end(); ++scc_it) {
             if (!call_consistent(*scc_it).first) {
                 return false;
