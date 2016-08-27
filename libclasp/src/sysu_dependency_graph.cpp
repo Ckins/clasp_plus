@@ -6,10 +6,6 @@
 
 namespace Sysu {
 
-    int min(int a, int b) {
-        return a <= b ? a : b;
-    }
-
     Rule::Rule(const Clasp::Asp::Rule &r) {
         for (Clasp::VarVec::const_iterator it = r.heads.begin(); it != r.heads.end(); ++it) {
             vars.insert(*it);
@@ -120,7 +116,7 @@ namespace Sysu {
         return VarSetPair(P1, N1);
     }
     VarSetPair DependencyGraph::T_inf(const VarSet& P, const VarSet& N) {
-        unsigned long iterations = vertices_num;  // vertices.size() - P.size() - N.size();
+        int iterations = vertices_num;  // vertices.size() - P.size() - N.size();
         VarSetPair P_N = VarSetPair(P, N), P1_N1;
         bool reach_fixpoint;
         VarSet::const_iterator it, it1;
@@ -156,19 +152,19 @@ namespace Sysu {
         VarSetPair* J_K_ptr;  // avoid copy ^
         // start T-expand
         reduce(P_N_star.first, P_N_star.second);
-        bool has_consistent_SCC = true;
-        while (has_consistent_SCC) {
-            has_consistent_SCC = false;
-            for (SCCVec::const_iterator it = SCCs.begin(); it != SCCs.end(); ++it) {
-                if (!has_outgoing_edge(*it)) {  // with no outgoing edge
-                    call_consistent_result = call_consistent(*it);
+        bool has_possible_consistent_SCC = true;
+        while (has_possible_consistent_SCC) {
+            has_possible_consistent_SCC = false;
+            for (SCCVec::const_iterator scc_it = SCCs.begin(); scc_it != SCCs.end(); ++scc_it) {
+                if (!has_outgoing_edge(*scc_it)) {  // with no outgoing edge
+                    call_consistent_result = call_consistent(*scc_it);
                     if (call_consistent_result.first) {
                         J_K_ptr = &call_consistent_result.second;
                         P_N_star.first.insert(J_K_ptr->first.begin(), J_K_ptr->first.end());  // P + J
                         P_N_star.second.insert(J_K_ptr->second.begin(), J_K_ptr->second.end());  // N + K
                         P_N_star = T_inf(P_N_star.first, P_N_star.second);
                         reduce(P_N_star.first, P_N_star.second);
-                        has_consistent_SCC = true;
+                        has_possible_consistent_SCC = true;
                     }
                 }
             }
@@ -176,7 +172,6 @@ namespace Sysu {
         return P_N_star;
     }
     bool DependencyGraph::has_outgoing_edge(const SCC &scc) {
-        Literal v, w;
         for (SCC::const_iterator v_it = scc.begin(); v_it != scc.end(); ++v_it) {
             for (GraphType::iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {  // v: edge_it->first
                 if (v_it->var() == edge_it->first.var()  && !edge_it->first.watched()) {
@@ -221,9 +216,9 @@ namespace Sysu {
                     if (!w.watched()) {  // w is still in graph
                         if (DFN[w.var()] <= 0) {  // not visited by tarjan
                             tarjan(w);
-                            LOW[v.var()] = min(LOW[v.var()], LOW[w.var()]);
+                            LOW[v.var()] = LOW[w.var()] < LOW[v.var()] ? LOW[w.var()] : LOW[v.var()];
                         } else if (find_var(tarjan_stack, w)) {  // in stack
-                            LOW[v.var()] = min(LOW[v.var()], DFN[w.var()]);
+                            LOW[v.var()] = DFN[w.var()] < LOW[v.var()] ? DFN[w.var()] : LOW[v.var()];
                         }
                     }
                 }
@@ -242,7 +237,6 @@ namespace Sysu {
     std::pair<bool, VarSetPair> DependencyGraph::call_consistent(const SCC& scc) {
         VarSet J, K;
         Var v = scc.begin()->var();
-        DetailedGraphType::const_iterator it;
         call_consistent_dfs(scc, v, J, K, false);
         std::cout << "---call_consistent Start---" << std::endl;
         print_SCC(scc);
@@ -255,26 +249,26 @@ namespace Sysu {
             std::cout << *it << " ";
         }
         std::cout << std::endl;
+        DetailedGraphType::const_iterator signed_edge_it;
         bool p_in_J, q_in_J, pq_in_J, pq_in_K;  // !p_in_J implies p_in_K
         for (LitSet::const_iterator p_it = scc.begin(); p_it != scc.end(); ++p_it) {
             for (LitSet::const_iterator q_it = scc.begin(); q_it != scc.end(); ++q_it) { // p->q
-                it = signed_edges_ptr->find(SimpleEdge(p_it->var(), q_it->var()));
-                if (it != signed_edges_ptr->end()) {  // find p->q in graph
-                    std::cout << p_it->var() << " -> " << q_it->var() << ": " << (it->second == POS_EDGE ? "POS" : "NEG");
+                signed_edge_it = signed_edges_ptr->find(SimpleEdge(p_it->var(), q_it->var()));
+                if (signed_edge_it != signed_edges_ptr->end()) {  // find p->q in graph
+                    std::cout << p_it->var() << " -> " << q_it->var() << ": " << (signed_edge_it->second == POS_EDGE ? "POS" : "NEG");
                     p_in_J = J.find(p_it->var()) != J.end();
                     q_in_J = J.find(q_it->var()) != J.end();
                     pq_in_J = p_in_J && q_in_J;
                     pq_in_K = !p_in_J && !q_in_J;
                     std::cout << ", " << p_it->var() << " in " << (p_in_J ? "J" : "K") << ", " << q_it->var() << " in " << (q_in_J ? "J" : "K") << std::endl;
-                    if ((it->second == POS_EDGE && (!pq_in_J && !pq_in_K))
-                        || (it->second == NEG_EDGE && (pq_in_J || pq_in_K))) {
+                    if ((signed_edge_it->second == POS_EDGE && (!pq_in_J && !pq_in_K))
+                        || (signed_edge_it->second == NEG_EDGE && (pq_in_J || pq_in_K))) {
                         std::cout << "Call Consistent Fail: " << p_it->var() << " -> " << q_it->var() << std::endl;
                         return std::pair<bool, VarSetPair>(false, VarSetPair(J, K));
                     }
                 }
             }
         }
-        std::cout << "TRUE" << std::endl;
         return std::pair<bool, VarSetPair>(true, VarSetPair(J, K));
     };
     void DependencyGraph::call_consistent_dfs(const SCC& scc, const Var& v, VarSet& J, VarSet& K, int mark) {
