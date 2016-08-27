@@ -85,7 +85,7 @@ namespace Sysu {
     }
 
     void Prg::print() {
-        dependencyGraph.T_once(VarSet(), VarSet());
+        dependencyGraph.T_expand(VarSet(), VarSet());
         std::cout << "---Normal Rules & Facts---" << std::endl;
         print_rules(rules);
         std::cout << "---Constraints---" << std::endl;

@@ -66,6 +66,7 @@ namespace Sysu {
          */
         VarSetPair T_once(const VarSet& P, const VarSet& N);
         VarSetPair T_inf(const VarSet& P, const VarSet& N);
+        VarSetPair T_expand(const VarSet& P, const VarSet& N);
 
         // unknown todo
         void W_once();
@@ -76,18 +77,10 @@ namespace Sysu {
          */
         void W_expand();
 
-        /*
-         * Update internal SCCs and Return a copy of it.
-         */
-        SCCVec find_SCCs();
+        // Update internal SCCs and Return a copy of it.
+        void find_SCCs();
 
-        /*
-         * check whether we should continue
-         * if the dg under (P, N) is not call-consistent,
-         * (P, N) can NOT be expanded to an AS.
-         */
-        SCCVec check_SCCs();
-
+        // return true if every SCC in SCCs is call-consistent
         bool whole_call_consistent();
 
         // auxiliary functions
@@ -97,13 +90,16 @@ namespace Sysu {
         GraphType graph_;
         SCCVec SCCs;
         VarSet vertices;
+        int vertices_num;
         //targan
         void tarjan(const Literal& v);
+        bool find_var(const LitVec& list, const Literal& item);
         int* DFN;
         int* LOW;
         int tarjan_index;
         LitVec tarjan_stack;
         // methods
+        bool has_outgoing_edge(const SCC& scc);
         std::pair<bool, VarSetPair> call_consistent(const SCC& scc);
         void call_consistent_dfs(const SCC& scc, const Var& v, VarSet& J, VarSet& K, int mark);
         void print_SCC(const SCC& scc);
