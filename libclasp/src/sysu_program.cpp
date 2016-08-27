@@ -64,8 +64,9 @@ namespace Sysu {
     bool Prg::break_constraint(const LitSet &P, const LitSet &N) { }
 
     void Prg::print_rules(const RuleVec& l) {
+        int first_term;
         for (RuleVec::const_iterator r_it = l.begin(); r_it != l.end(); ++r_it) {
-            int first_term = 1;
+            first_term = 1;
             for (LitVec::const_iterator it = r_it->heads.begin(); it != r_it->heads.end(); ++it) {
                 if (first_term) first_term = 0;
                 else std::cout << " | ";
@@ -89,6 +90,6 @@ namespace Sysu {
         std::cout << "---Constraints---" << std::endl;
         print_rules(constraints);
         std::cout << "---End---" << std::endl;
-        std::cout << "Call Consistent: " << dependencyGraph.whole_call_consistent() << std:: endl;
+        std::cout << "Call Consistent: \n" << dependencyGraph.whole_call_consistent() << std:: endl;
     }
 }

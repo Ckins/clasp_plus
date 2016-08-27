@@ -1644,7 +1644,7 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
 
 			// prg->doSolve(P, N);
 			prg->print();
-			prg->dependencyGraph.print_SCCs();
+			// prg->dependencyGraph.print_SCCs();
             //------------------
             // End Modification
 

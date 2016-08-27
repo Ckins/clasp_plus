@@ -106,6 +106,45 @@ namespace Sysu {
             SCCs.push_back(scc);
         }
     }
+    std::pair<bool, LitSetPair> DependencyGraph::call_consistent(const SCC& scc) {
+        LitSet J, K;
+        Literal v = *scc.begin();
+        DetailedGraphType::const_iterator it;
+        call_consistent_dfs(scc, v, J, K, false);
+        std::cout << "---call_consistent Call---" << std::endl;
+        print_SCC(scc);
+        std::cout << "In J: ";
+        for (LitSet::const_iterator it = J.begin(); it != J.end(); ++it) {
+            std::cout << it->var() << " ";
+        }
+        std::cout << std::endl << "In K: ";
+        for (LitSet::const_iterator it = K.begin(); it != K.end(); ++it) {
+            std::cout << it->var() << " ";
+        }
+        std::cout << std::endl;
+        std::cout << "---call_consistent End---" << std::endl;
+        bool p_in_J, q_in_J, pq_in_J, pq_in_K;  // !p_in_J implies p_in_K
+        for (LitSet::const_iterator p_it = scc.begin(); p_it != scc.end(); ++p_it) {
+            for (LitSet::const_iterator q_it = scc.begin(); q_it != scc.end(); ++q_it) { // p->q
+                it = signed_edges_ptr->find(SimpleEdge(p_it->var(), q_it->var()));
+                if (it != signed_edges_ptr->end()) {  // find p->q in graph
+                    std::cout << p_it->var() << " -> " << q_it->var() << ": " << (it->second == POS_EDGE ? "POS" : "NEG");
+                    p_in_J = J.find(*p_it) != J.end();
+                    q_in_J = J.find(*q_it) != J.end();
+                    pq_in_J = p_in_J && q_in_J;
+                    pq_in_K = !p_in_J && !q_in_J;
+                    std::cout << ", " << p_it->var() << " in " << (p_in_J ? "J" : "K") << ", " << q_it->var() << " in " << (q_in_J ? "J" : "K") << std::endl;
+                    if ((it->second == POS_EDGE && (!pq_in_J && !pq_in_K))
+                        || (it->second == NEG_EDGE && (pq_in_J || pq_in_K))) {
+                        std::cout << "Call Consistent Fail: " << p_it->var() << " -> " << q_it->var() << std::endl;
+                        return std::pair<bool, LitSetPair>(false, LitSetPair(J, K));
+                    }
+                }
+            }
+        }
+        std::cout << "TRUE" << std::endl;
+        return std::pair<bool, LitSetPair>(true, LitSetPair(J, K));
+    };
     void DependencyGraph::call_consistent_dfs(const SCC& scc, const Literal& v, LitSet& J, LitSet& K, int mark) {
         if (mark) {
             J.insert(v);
@@ -120,30 +159,9 @@ namespace Sysu {
             }
         }
     }
-    std::pair<bool, LitSetPair> DependencyGraph::call_consistent(const SCC& scc) {
-        LitSet J, K;
-        Literal v = *scc.begin();
-        DetailedGraphType::const_iterator it;
-        call_consistent_dfs(scc, v, J, K, false);
-        bool p_in_J, q_in_J, pq_in_J, pq_in_K;  // !p_in_J implies p_in_K
-        for (LitSet::const_iterator p_it = scc.begin(); p_it != scc.end(); ++p_it) {
-            for (LitSet::const_iterator q_it = scc.begin(); q_it != scc.end(); ++q_it) { // p->q
-                it = signed_edges_ptr->find(SimpleEdge(p_it->var(), q_it->var()));
-                if (it != signed_edges_ptr->end()) {  // find p->q in graph
-                    p_in_J = J.find(*p_it) != J.end();
-                    q_in_J = J.find(*q_it) != J.end();
-                    pq_in_J = p_in_J && q_in_J;
-                    pq_in_K = !p_in_J && !q_in_J;
-                    if ((it->second == POS_EDGE && (!pq_in_J && !pq_in_K))
-                        || (it->second == NEG_EDGE && (pq_in_J || pq_in_K))) {
-                        return std::pair<bool, LitSetPair>(false, LitSetPair(J, K));
-                    }
-                }
-            }
-        }
-        return std::pair<bool, LitSetPair>(true, LitSetPair(J, K));
-    };
     bool DependencyGraph::whole_call_consistent() {
+        find_SCCs();
+        std::cout << "Size: " << SCCs.size() << std::endl;
         for (SCCVec::const_iterator scc_it = SCCs.begin(); scc_it != SCCs.end(); ++scc_it) {
             if (!call_consistent(*scc_it).first) {
                 return false;
