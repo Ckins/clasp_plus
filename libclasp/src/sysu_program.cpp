@@ -36,11 +36,10 @@ namespace Sysu {
     }
 
     void Prg::do_solve(const VarSet &P, const VarSet &N) {
-        dependencyGraph.resume();
         break_constraint(P, N);
 
         // every reduce the graph find scc automatically
-        dependencyGraph.reduce(P, N);
+        dependencyGraph.graph_reduce(P, N);
 
         if (!dependencyGraph.whole_call_consistent()) {
             return;
@@ -62,7 +61,7 @@ namespace Sysu {
         // dg.reduce(p', n') and findScc()
         // if dg.whole_call-consistent, w_expand()
 
-        dependencyGraph.reduce(P_N_star.first, P_N_star.second);
+        dependencyGraph.graph_reduce(P_N_star.first, P_N_star.second);
         if (dependencyGraph.whole_call_consistent()) {
             finalize(P_N_star);
         }

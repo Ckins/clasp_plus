@@ -1643,14 +1643,14 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
             Sysu::Prg* prg = Sysu::Prg::getPrg();
 
 			// prg->doSolve(P, N);
-			prg->print();
+			//prg->print();
 			// prg->dependencyGraph.print_SCCs();
             //------------------
             // End Modification
 
 			// kinsang modification start
 
-			call_consistent_construction();
+			//call_consistent_construction();
 
 			// printAssignment();
 			// end modification

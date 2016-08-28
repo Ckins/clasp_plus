@@ -31,11 +31,12 @@ namespace Sysu {
     typedef LitSet SCC;
     typedef std::pair<VarSet, VarSet> VarSetPair;
     typedef Clasp::PodVector<SCC>::type SCCVec;
-    enum EDGE_TYPE { NEG_EDGE, POS_EDGE };
     typedef std::pair<Var, Var> SimpleEdge;
     typedef std::pair<Literal, Literal> Edge;
     typedef std::pair<Literal, LitVec> MultiEdge;
     typedef Clasp::PodVector<MultiEdge>::type GraphType;
+    enum EDGE_TYPE { NEG_EDGE, POS_EDGE };
+    enum RULE_SATISFACTION { RULE_FAIL=-1, RULE_UNKNOWN=0, RULE_SATISFIED=1};
     typedef std::pair<SimpleEdge, EDGE_TYPE> SignedEdge;
     typedef std::map<SimpleEdge, EDGE_TYPE > DetailedGraphType;
 
@@ -55,27 +56,16 @@ namespace Sysu {
 
         // constructor parts
         void add_edge(const Rule& rule);
-        void reduce(const VarSet& P, const VarSet& N);
+        void graph_reduce(const VarSet& P, const VarSet& N);
+        void gl_reduce(const VarSet& P);
         void resume();
 
         // construction Answer Set key algos
-
-        /*
-         * Input : (P, N)
-         * Ouput : (P', N')
-         */
-        VarSetPair T_once(const VarSet& P, const VarSet& N);
-        VarSetPair T_inf(const VarSet& P, const VarSet& N);
-        VarSetPair T_expand(const VarSet& P, const VarSet& N);
-
-        // unknown todo
-        void W_once();
-
-        /*
-         * Input : (P, N)
-         * Output : (P*, N*)
-         */
-        void W_expand();
+        VarSet T_once_plus(const VarSet& P, const VarSet& N);
+        VarSet greatest_unfounded_set(const VarSet& P, const VarSet& N);
+        VarSetPair W_once(const VarSet& P, const VarSet& N);
+        VarSetPair W_inf(const VarSet& P, const VarSet& N);
+        VarSetPair W_expand(const VarSet& P, const VarSet& N);
 
         // Update internal SCCs and Return a copy of it.
         void find_SCCs();
@@ -83,14 +73,15 @@ namespace Sysu {
         // return true if every SCC in SCCs is call-consistent
         bool whole_call_consistent();
 
-        // auxiliary functions
+        // auxiliary methods
         void print_graph();
         void print_SCCs();
+        void prepare();
     private:
         GraphType graph_;
         SCCVec SCCs;
         VarSet vertices;
-        int vertices_num;
+        unsigned long vertices_num;
         //targan
         void tarjan(const Literal& v);
         bool find_var(const LitVec& list, const Literal& item);
@@ -99,6 +90,8 @@ namespace Sysu {
         int tarjan_index;
         LitVec tarjan_stack;
         // methods
+        bool reach_fixpoint(const VarSet& Ax, const VarSet& B);
+        bool reach_fixpoint(const VarSetPair& A1_B1, const VarSetPair& A2_B2);
         bool has_outgoing_edge(const SCC& scc);
         std::pair<bool, VarSetPair> call_consistent(const SCC& scc);
         void call_consistent_dfs(const SCC& scc, const Var& v, VarSet& J, VarSet& K, int mark);
