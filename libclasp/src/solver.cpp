@@ -1650,7 +1650,7 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
 
 			// kinsang modification start
 
-			//call_consistent_construction();
+			call_consistent_construction();
 
 			// printAssignment();
 			// end modification

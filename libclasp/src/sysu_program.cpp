@@ -53,12 +53,14 @@ namespace Sysu {
         VarSetPair P_N_star = dependencyGraph.W_inf(P_N.first, P_N.second);
 
         // if (P', N') is null return;
-        if (empty_set(P_N_star)) return;
+        // if (empty_set(P_N_star)) return;
 
         // if (P, N) is already a fixed pointed
-        if (same_set(P_N, VarSetPair(P, N))) {
+        if (same_set(P_N_star, VarSetPair(P, N))) {
             finalize(P_N);
         }
+
+        // todo check whether the p_n_star already has
 
         // if the return fixed point is call-consistent, it could be expanded to AS
         dependencyGraph.graph_reduce(P_N_star.first, P_N_star.second);
