@@ -108,7 +108,7 @@ namespace Sysu {
         VarSet T_plus;
         RULE_SATISFACTION rule_judgement;
         for (GraphType::iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {  // head(v): edge_it->first
-            if (!edge_it->first.watched()) {                    // rule is still in graph
+            if (!edge_it->first.watched()) {                        // rule is still in graph
                 rule_judgement = RULE_SATISFIED;
                 for (LitVec::iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {  // body(w): *w_it
                     if (!w_it->watched()) {                         // body literal is still in graph
@@ -137,8 +137,14 @@ namespace Sysu {
         return T_plus;
     }
     VarSet DependencyGraph::greatest_unfounded_set(const VarSet &P, const VarSet &N) {
-        gl_reduce(P);
-        return T_once_plus(P, N);
+        VarSet phi_known, phi_deduced = P, gus;
+        while (!reach_fixpoint(phi_known, phi_deduced)) {
+            phi_known = phi_deduced;
+            gl_reduce(phi_known);
+            phi_deduced = T_once_plus(P, N);
+        }
+        std::set_difference(vertices.begin(), vertices.end(), phi_deduced.begin(), phi_deduced.end(), std::inserter(gus, gus.begin()));
+        return gus;
     }
     VarSetPair DependencyGraph::W_once(const VarSet& P, const VarSet& N) {
         VarSet T_plus, U;
@@ -193,6 +199,7 @@ namespace Sysu {
                         P_N_star = W_inf(P_N_star.first, P_N_star.second);
                         graph_reduce(P_N_star.first, P_N_star.second);
                         has_possible_consistent_SCC = true;
+                        break;
                     }
                 }
             }
