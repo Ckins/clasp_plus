@@ -39,7 +39,7 @@ namespace Sysu {
     enum RULE_SATISFACTION { RULE_FAIL=-1, RULE_UNKNOWN=0, RULE_SATISFIED=1};
     typedef std::pair<SimpleEdge, EDGE_TYPE> SignedEdge;
     typedef std::map<SimpleEdge, EDGE_TYPE > DetailedGraphType;
-    const Var FIXPOINT_FAILURE_MARK = -1;
+    const Var FIXPOINT_FAILURE_MARK = 0;
 
     class Rule {
     public:
@@ -77,6 +77,12 @@ namespace Sysu {
         // auxiliary methods
         void print_graph();
         void print_SCCs();
+
+        void mark_fixpoint_failure(VarSet& s);
+        void mark_fixpoint_failure(VarSetPair& s1_s2);
+        bool fixpoint_fail(const VarSet& s);
+        bool fixpoint_fail(const VarSetPair& s1_s2);
+
     private:
         GraphType graph_;
         SCCVec SCCs;
@@ -92,10 +98,6 @@ namespace Sysu {
         // methods
         bool reach_fixpoint(const VarSet& Ax, const VarSet& B);
         bool reach_fixpoint(const VarSetPair& A1_B1, const VarSetPair& A2_B2);
-        void mark_fixpoint_failure(VarSet& s);
-        void mark_fixpoint_failure(VarSetPair& s1_s2);
-        bool fixpoint_fail(const VarSet& s);
-        bool fixpoint_fail(const VarSetPair& s1_s2);
         bool has_outgoing_edge(const SCC& scc);
         VarSetPair call_consistent(const SCC& scc);
         void call_consistent_dfs(const SCC& scc, const Var& v, VarSet& J, VarSet& K, int mark);
