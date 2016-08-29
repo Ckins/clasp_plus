@@ -41,7 +41,6 @@ namespace Sysu {
     typedef std::map<SimpleEdge, EDGE_TYPE > DetailedGraphType;
     const Var FIXPOINT_FAILURE_MARK = -1;
 
-
     class Rule {
     public:
         LitVec heads;  // Vector<Var>
