@@ -13,7 +13,7 @@
     </ADDITIONAL_GENERATION_ENVIRONMENT>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e11b0408-bf8d-466c-8ecf-7b443d88c5a3" name="Default" comment="fix bugs caused by separating two classes&#10;">
+    <list default="true" id="e11b0408-bf8d-466c-8ecf-7b443d88c5a3" name="Default" comment="">
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="clasp-3.1.4.iws" />
@@ -377,7 +377,13 @@
       <option name="project" value="LOCAL" />
       <updated>1472452299607</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="fix bugs caused by separating two classes&#10;">
+      <created>1472452554780</created>
+      <option name="number" value="00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1472452554780</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TodoView">
@@ -429,7 +435,6 @@
     <MESSAGE value="Inspired by Prof.Ji. Init" />
     <MESSAGE value="Add sysu namespace and new work" />
     <MESSAGE value="design interface&#10;" />
-    <MESSAGE value="fix bugs caused by separating two classes&#10;" />
     <MESSAGE value="encapsulate algos into graph and logic remains in prg&#10;" />
     <MESSAGE value="Interfaces design III&#10;" />
     <MESSAGE value="merge from junhong&#10;" />
@@ -439,7 +444,8 @@
     <MESSAGE value="First complete version&#10;" />
     <MESSAGE value="first version&#10;&#10;" />
     <MESSAGE value="Begin debug." />
-    <option name="LAST_COMMIT_MESSAGE" value="Begin debug." />
+    <MESSAGE value="fix bugs caused by separating two classes&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix bugs caused by separating two classes&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
