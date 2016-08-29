@@ -35,9 +35,6 @@ namespace Sysu {
             }
         }
     }
-    void DependencyGraph::prepare() {
-
-    }
     void DependencyGraph::graph_reduce(const VarSet& P, const VarSet& N) {
         resume();
         // use Log(n) for assignment check

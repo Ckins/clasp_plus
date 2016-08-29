@@ -76,7 +76,6 @@ namespace Sysu {
         // auxiliary methods
         void print_graph();
         void print_SCCs();
-        void prepare();
     private:
         GraphType graph_;
         SCCVec SCCs;
