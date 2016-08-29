@@ -84,7 +84,7 @@ namespace Sysu {
                     if (a_it != P.end()) {              // assigned true, negLit is false
                         edge_it->first.watch();         // remove edge by removing head
                         break;                          // no need to check rest
-                    } else {                            // w is false, Literal(w) uncertain
+                    } else {                            // assigned false or unknown, negLit is true or unknown
                         body_it->watch();               // remove this negLit
                     }
                 }
@@ -134,11 +134,12 @@ namespace Sysu {
         return T_plus;
     }
     VarSet DependencyGraph::greatest_unfounded_set(const VarSet &P, const VarSet &N) {
-        VarSet phi_known, phi_deduced = P, gus;
+        VarSet phi_known, phi_deduced = P, gus;  // phi is known or duduced from fact, gus is greatest unfounded set
         while (!reach_fixpoint(phi_known, phi_deduced)) {
             phi_known = phi_deduced;
             gl_reduce(phi_known);
             phi_deduced = T_once_plus(P, N);
+            phi_deduced.insert(phi_known.begin(), phi_known.end());
         }
         std::set_difference(vertices.begin(), vertices.end(), phi_deduced.begin(), phi_deduced.end(), std::inserter(gus, gus.begin()));
         return gus;
@@ -175,7 +176,8 @@ namespace Sysu {
                 P_N = P1_N1;
             }
         }
-        return P1_N1;  // TODO(2016-08-27): if reached maximum iteration, return last P1, N1?
+        std::cout << "W-infinite Fail!" << std::endl;
+        return P1_N1;
     }
     VarSetPair DependencyGraph::W_expand(const VarSet& P, const VarSet& N) {
         VarSetPair P_N_star = W_inf(P, N);
