@@ -149,7 +149,7 @@ namespace Sysu {
         U = greatest_unfounded_set(P, N);
         return VarSetPair(T_plus, U);
     }
-    bool reach_fixpoint(const VarSet& A, const VarSet& B) {
+    bool DependencyGraph::reach_fixpoint(const VarSet& A, const VarSet& B) {
         if (A.size() == B.size()) {
             for (VarSet::const_iterator it1 = A.begin(), it2 = B.begin(); it1 != A.end() && it2 != B.end(); ++it1, ++it2) {
                 if (*it1 != *it2) {

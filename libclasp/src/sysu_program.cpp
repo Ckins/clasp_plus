@@ -36,7 +36,9 @@ namespace Sysu {
     }
 
     void Prg::do_solve(const VarSet &P, const VarSet &N) {
-        break_constraint(P, N);
+
+        // if the partial assignment can not break constraints, quit
+        if (!break_constraint(P, N)) return;
 
         // every reduce the graph find scc automatically
         dependencyGraph.graph_reduce(P, N);
@@ -45,22 +47,20 @@ namespace Sysu {
             return;
         }
 
-        VarSetPair P_N_1 = dependencyGraph.T_once(P, N);
-        // if fixed point
-
-        if (same_set(P_N_1, VarSetPair(P, N))) {
-            finalize(P_N_1);
-        }
-
-        // (p', N') = W.inf(P', N')
-        VarSetPair P_N_star = dependencyGraph.T_inf(P_N_1.first, P_N_1.second);
+        // (p×, N×) = W.inf(P, N)
+        // iterative steps to get the fixed point under W
+        VarSetPair P_N = VarSetPair(P, N);
+        VarSetPair P_N_star = dependencyGraph.W_inf(P_N.first, P_N.second);
 
         // if (P', N') is null return;
         if (empty_set(P_N_star)) return;
 
-        // dg.reduce(p', n') and findScc()
-        // if dg.whole_call-consistent, w_expand()
+        // if (P, N) is already a fixed pointed
+        if (same_set(P_N, VarSetPair(P, N))) {
+            finalize(P_N);
+        }
 
+        // if the return fixed point is call-consistent, it could be expanded to AS
         dependencyGraph.graph_reduce(P_N_star.first, P_N_star.second);
         if (dependencyGraph.whole_call_consistent()) {
             finalize(P_N_star);
@@ -68,7 +68,7 @@ namespace Sysu {
     }
 
     void Prg::finalize(const VarSetPair &P_N) {
-        VarSetPair result = dependencyGraph.T_expand(P_N.first, P_N.second);
+        VarSetPair result = dependencyGraph.W_expand(P_N.first, P_N.second);
         report_answer(result.first);
     }
 
