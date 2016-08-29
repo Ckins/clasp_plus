@@ -1706,14 +1706,13 @@ void Solver::call_consistent_construction() {
 		}
 	}*/
 
-
 	for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
-		std::cout << "Atom: " << it->second.name.c_str() << ", Index: " << it->second.lit.index() << ", Var: " << it->second.lit.index() << ", Sign: " << it->second.lit.sign() << ", Assigned: " << assign_.value(it->second.lit.var()) << std::endl;
+		// std::cout << "Key: " << it->first << ", Atom: " << it->second.name.c_str() << ", Index: " << it->second.lit.index() << ", Var: " << it->second.lit.index() << ", Sign: " << it->second.lit.sign() << ", Assigned: " << assign_.value(it->second.lit.var()) << std::endl;
 		if (assign_.value(it->second.lit.var()) == value_true) {
-			P.insert(it->second.lit.var());
+			P.insert(it->first);
 		}
 		if (assign_.value(it->second.lit.var()) == value_false) {
-			N.insert(it->second.lit.var());
+			N.insert(it->first);
 		}
 	}
 
