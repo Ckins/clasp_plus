@@ -44,11 +44,6 @@ namespace Sysu {
          */
         bool break_constraint(const VarSet &P, const VarSet &N);
 
-        /*
-         * check whether two assignment is the same
-         */
-
-        bool same_set(const VarSetPair &P_N, const VarSetPair &P_N_2);
 
         /*
          * print the answer set
@@ -56,22 +51,13 @@ namespace Sysu {
 
         void report_answer(const VarSet &P);
 
-        /*
-         * check whether the assignment is empty
-         */
-
-        inline bool empty_set(const VarSetPair &P_N);
-
-        /*
-         * finalize construction and report the result
-         */
-        void finalize(const VarSetPair &P_N);
 
         // auxiliary function
         static Prg *getPrg();
         // add/check information
         void add_rule(const Clasp::Asp::Rule& r);
         void print();
+        int tmp;
     private:
         Prg();
         void print_rules(const RuleVec& rules);

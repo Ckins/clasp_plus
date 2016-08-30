@@ -255,6 +255,13 @@ bool LogicProgram::doEndProgram() {
 		addConstraints();
 		if (accu) { accu->accu(stats); }
 	}
+
+    // SYSU Modification (16-08-29)
+    //------------------
+    Sysu::Prg::getPrg()->symbolTablePtr = &ctx()->symbolTable();
+    //------------------
+    // End Modification
+
 	return ctx()->ok();
 }
 

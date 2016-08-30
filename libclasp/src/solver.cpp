@@ -1634,27 +1634,11 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
 				if ((limit.reached() || learntLimit(limit))&&numFreeVars()) { return value_free;  }
 			}
 
-			// w(P, N) = (P', N') - fixed point and call-consistent
-			// unconverged limits upperbound = number of atoms
+			// ----------modification--------
 
+            call_consistent_construction();
 
-            // SYSU Modification (junhong 16/08/25)
-            //------------------
-            Sysu::Prg* prg = Sysu::Prg::getPrg();
-
-			// prg->doSolve(P, N);
-			//prg->print();
-			// prg->dependencyGraph.print_SCCs();
-            //------------------
-            // End Modification
-
-			// kinsang modification start
-
-			// debugging
-			call_consistent_construction();
-
-			// printAssignment();
-			// end modification
+			// --------------end-------------
 
 			if (decideNextBranch(rf)) { conflicts = !propagate(); }
 			else                      { break; }
@@ -1687,34 +1671,21 @@ void Solver::printAssignment() {
 }
 
 void Solver::call_consistent_construction() {
-	Sysu::VarSet P;
-	Sysu::VarSet N;
+	Sysu::VarSet P, N;
 	Sysu::Prg* prg = Sysu::Prg::getPrg();
 
-	/* method one with clasp's tricks
-	 *
-	 * 	Sysu::LitSet P;
-	 *  Sysu::LitSet N;
-	 *
-	// travelsal the symbol table to get the partial assignment
+    std::cout << "\n===Partial Assignment: " << ++prg->tmp << "===" << std::endl;
 	for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
-		if (assign_.value(it->second.lit.var()) == trueValue(it->second.lit)) {
-			P.insert(it->second.lit);
-		}
-		if (assign_.value(it->second.lit.var()) == falseValue(it->second.lit)) {
-			N.insert(it->second.lit);
-		}
-	}*/
-
-	for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
-		// std::cout << "Key: " << it->first << ", Atom: " << it->second.name.c_str() << ", Index: " << it->second.lit.index() << ", Var: " << it->second.lit.index() << ", Sign: " << it->second.lit.sign() << ", Assigned: " << assign_.value(it->second.lit.var()) << std::endl;
-		if (assign_.value(it->second.lit.var()) == value_true) {
+        if (assign_.value(it->second.lit.var()) == value_true) {
+//            std::cout << "P(" << it->first << ") ";
 			P.insert(it->first);
-		}
-		if (assign_.value(it->second.lit.var()) == value_false) {
+		} else if (assign_.value(it->second.lit.var()) == value_false) {
+//            std::cout << "N(" << it->first << ") ";
 			N.insert(it->first);
 		}
 	}
+//	std::cout << "\nP Size: " << P.size() << ", N Size: " << N.size() << std::endl;
+//    std::cout << "===Partial Assignment End===\n" << std::endl;
 
 	prg->do_solve(P, N);
 }
