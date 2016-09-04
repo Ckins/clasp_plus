@@ -38,7 +38,7 @@ namespace Sysu {
     enum EDGE_TYPE { NEG_EDGE, POS_EDGE };
     enum RULE_SATISFACTION { RULE_FAIL=-1, RULE_UNKNOWN=0, RULE_SATISFIED=1};
     typedef std::pair<SimpleEdge, EDGE_TYPE> SignedEdge;
-    typedef std::map<SimpleEdge, EDGE_TYPE > DetailedGraphType;
+    typedef std::map<SimpleEdge, EDGE_TYPE> DetailedGraphType;
     const Var FAILURE_MARK = 0;
 
     class Rule {
@@ -90,7 +90,6 @@ namespace Sysu {
         unsigned long vertices_num;
         //targan
         void tarjan(const Literal& v);
-        bool find_var(const LitSet& list, const Literal& item);
         bool find_var(const LitVec& list, const Literal& item);
         int* DFN;
         int* LOW;

@@ -258,7 +258,9 @@ bool LogicProgram::doEndProgram() {
 
     // SYSU Modification (16-08-29)
     //------------------
-    Sysu::Prg::getPrg()->symbolTablePtr = &ctx()->symbolTable();
+    Sysu::Prg* prg = Sysu::Prg::getPrg();
+	prg->symbolTablePtr = &ctx()->symbolTable();
+	prg->print_program();
     //------------------
     // End Modification
 

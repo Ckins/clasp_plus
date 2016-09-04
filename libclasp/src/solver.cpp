@@ -1636,6 +1636,7 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
 
 			// ----------modification--------
 
+            printAssignment();
             call_consistent_construction();
 
 			// --------------end-------------
@@ -1655,8 +1656,8 @@ void Solver::printAssignment() {
 	// kinsang modified for debugging
 	// modified on Aug 25
 
-	std::cout << "This is No." << ++count_emu_num << " assumption:" << std::endl;
-
+	std::cout << "This is No." << count_emu_num + 1 << " assumption:" << std::endl;
+    std::cout << "Total: " << assign_.numVars() << ", Free: " << assign_.free() << std::endl;
 	// travelsal the symbol table to print the partial assignment
 	for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
 		if (assign_.value(it->second.lit.var()) == trueValue(it->second.lit)) {
@@ -1666,6 +1667,10 @@ void Solver::printAssignment() {
 			std::cout << "false:" << it->second.name.c_str() << std::endl;
 		}
 	}
+    int a = 0;
+    for (PodVector<uint32>::type::const_iterator it = assign_.assign_.begin(); it != assign_.assign_.end(); ++it) {
+        std::cout << ++a << ": " << (*it >> 4u) << std::endl;
+    }
 	std::cout << "-----------------------------------------------" << std::endl;
 	// end modification
 }
@@ -1674,18 +1679,23 @@ void Solver::call_consistent_construction() {
 	Sysu::VarSet P, N;
 	Sysu::Prg* prg = Sysu::Prg::getPrg();
 
-    std::cout << "\n===Partial Assignment: " << ++prg->tmp << "===" << std::endl;
+    std::cout << "\n===Partial Assignment " << ++count_emu_num << "===" << std::endl;
 	for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
-        if (assign_.value(it->second.lit.var()) == value_true) {
-//            std::cout << "P(" << it->first << ") ";
-			P.insert(it->first);
-		} else if (assign_.value(it->second.lit.var()) == value_false) {
-//            std::cout << "N(" << it->first << ") ";
-			N.insert(it->first);
-		}
+        switch (assign_.value(it->second.lit.var())) {
+        case value_true:
+            std::cout << "P(" << it->first << ") ";
+            P.insert(it->first);
+            break;
+        case value_false:
+            std::cout << "N(" << it->first << ") ";
+            N.insert(it->first);
+            break;
+        default:
+            std::cout << "Free(" << it->first << ") ";
+        }
 	}
-//	std::cout << "\nP Size: " << P.size() << ", N Size: " << N.size() << std::endl;
-//    std::cout << "===Partial Assignment End===\n" << std::endl;
+	std::cout << "\nP Size: " << P.size() << ", N Size: " << N.size() << std::endl;
+    std::cout << "===Partial Assignment End===\n" << std::endl;
 
 	prg->do_solve(P, N);
 }

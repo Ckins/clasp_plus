@@ -6,7 +6,7 @@
 
 namespace Sysu {
 
-    Prg::Prg() { tmp=0;}
+    Prg::Prg() {}
 
     Prg* Prg::getPrg() {
         static Prg prg;
@@ -38,7 +38,7 @@ namespace Sysu {
     void Prg::do_solve(const VarSet &P, const VarSet &N) {
 
         // if the partial assignment can not break constraints, quit
-        if (!break_constraint(P, N)) return;
+        if (break_constraint(P, N)) return;
 
         // every reduce the graph find scc automatically
         dependencyGraph.graph_reduce(P, N);
@@ -50,7 +50,7 @@ namespace Sysu {
         // (p×, N×) = W.inf(P, N)
         // iterative steps to get the fixed point under W
         VarSetPair P_N_star = dependencyGraph.W_expand(P, N);
-        if (!dependencyGraph.failed(P_N_star)) {
+        if (!dependencyGraph.failed(P_N_star) && !break_constraint(P_N_star.first, P_N_star.second)) {
             report_answer(P_N_star.first);
         }
 
@@ -65,54 +65,96 @@ namespace Sysu {
     }
 
     void Prg::report_answer(const VarSet &P) {
-        // todo traversal and print the answer
-        std::cout << "We construct an answer set!" << std::endl;
-        // std::cout << P.size() << std::endl;
-        VarSet::iterator it = P.begin();
-
-        for (; it != P.end(); it++) std::cout << *it << " ";
-        std::cout << std::endl;
-        /*for (Clasp::SymbolTable::const_iterator it = symbolTablePtr->begin(); it != symbolTablePtr->end(); ++it) {
-
-            std::cout << (*it).second.lit.var() << std::endl;
-            /*if (P.find(it->second.lit.var()) != P.end()) {
-                std::cout << "true:" << it->second.name.c_str() << std::endl;
+        std::cout << "\n===Answer Set===" << std::endl;
+        for (VarSet::iterator it = P.begin(); it != P.end(); ++it) {
+            std::cout << *it;
+            for (Clasp::SymbolTable::const_iterator s_it = symbolTablePtr->begin();
+                 s_it != symbolTablePtr->end(); ++s_it) {
+                if (s_it->first == *it) {
+                    std::cout << "(" << s_it->second.name.c_str() << ") ";
+                }
             }
-        }*/
+        }
+        std::cout << "\n===Answer Set End===\n" << std::endl;
     }
 
     bool Prg::break_constraint(const VarSet &P, const VarSet &N) {
+        for (RuleVec::const_iterator c_it = constraints.begin(); c_it != constraints.end(); ++c_it) {  // constraint
+            for (LitVec::const_iterator b_it = c_it->body.begin(); b_it != c_it->body.end(); ++b_it) {  // constraint body
+                if (b_it->sign()) {                             // negLit
+                    if (P.find(b_it->var()) != P.end()) {       // true value, false literal
+                        std::cout << "Break Constraint: ";
+                        print_rule(*c_it);
 
-        // todo check constraint
-        return true;
+                        std::cout << "Current Answer Set: ";
+                        for (VarSet::iterator it = P.begin(); it != P.end(); ++it) {
+                            std::cout << *it;
+                            for (Clasp::SymbolTable::const_iterator s_it = symbolTablePtr->begin();
+                                 s_it != symbolTablePtr->end(); ++s_it) {
+                                if (s_it->first == *it) {
+                                    std::cout << "(" << s_it->second.name.c_str() << ") ";
+                                }
+                            }
+                        }
+                        std::cout << std::endl;
+
+                        return true;
+                    }
+                } else {                                        // posLit
+                    if (N.find(b_it->var()) != N.end()) {       // false value, true literal
+                        std::cout << "Break Constraint: ";
+                        print_rule(*c_it);
+
+                        std::cout << "Current Answer Set: ";
+                        for (VarSet::iterator it = P.begin(); it != P.end(); ++it) {
+                            std::cout << *it;
+                            for (Clasp::SymbolTable::const_iterator s_it = symbolTablePtr->begin();
+                                 s_it != symbolTablePtr->end(); ++s_it) {
+                                if (s_it->first == *it) {
+                                    std::cout << "(" << s_it->second.name.c_str() << ") ";
+                                }
+                            }
+                        }
+                        std::cout << std::endl;
+
+                        return true;
+                    }
+                }
+            }
+        }
+        std::cout << "Constraint Satisfied." << std::endl;
+        return false;
+    }
+
+    void Prg::print_rule(const Rule& r) {
+        int first_term = 1;
+        for (LitVec::const_iterator it = r.heads.begin(); it != r.heads.end(); ++it) {
+            if (first_term) first_term = 0;
+            else std::cout << " | ";
+            std::cout << it->var();
+        }
+        std::cout << " :- ";
+        first_term = 1;
+        for (LitVec::const_iterator it = r.body.begin(); it != r.body.end(); ++it) {
+            if (first_term) first_term = 0;
+            else std::cout << ", ";
+            if (it->sign()) std::cout << "not ";
+            std::cout << it->var();
+        }
+        std::cout << "." << std::endl;
     }
 
     void Prg::print_rules(const RuleVec& l) {
-        int first_term;
         for (RuleVec::const_iterator r_it = l.begin(); r_it != l.end(); ++r_it) {
-            first_term = 1;
-            for (LitVec::const_iterator it = r_it->heads.begin(); it != r_it->heads.end(); ++it) {
-                if (first_term) first_term = 0;
-                else std::cout << " | ";
-                std::cout << it->var();
-            }
-            std::cout << " :- ";
-            first_term = 1;
-            for (LitVec::const_iterator it = r_it->body.begin(); it != r_it->body.end(); ++it) {
-                if (first_term) first_term = 0;
-                else std::cout << ", ";
-                if (it->sign()) std::cout << "not ";
-                std::cout << it->var();
-            }
-            std::cout << "." << std::endl;
+            print_rule(*r_it);
         }
     }
 
-    void Prg::print() {
-        std::cout << "---Normal Rules & Facts---" << std::endl;
+    void Prg::print_program() {
+        std::cout << "\n---Normal Rules & Facts---" << std::endl;
         print_rules(rules);
         std::cout << "---Constraints---" << std::endl;
         print_rules(constraints);
-        std::cout << "---End---" << std::endl;
+        std::cout << "---End---\n" << std::endl;
     }
 }

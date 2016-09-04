@@ -796,6 +796,7 @@ private:
 			(this->*op)(p.var());
 		} while (p != stop);
 	}
+public:
 	AssignVec assign_; // for each var: three-valued assignment
 	ReasonVec reason_; // for each var: reason for being assigned (+ optional data)
 	PrefVec   pref_;   // for each var: set of preferred values

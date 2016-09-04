@@ -28,7 +28,7 @@ namespace Sysu {
         // member
         const Clasp::SymbolTable *symbolTablePtr;
         DependencyGraph dependencyGraph;
-        DetailedGraphType signed_edges;  // [< <Lit, Lit>, 0>, < <Lit, Lit>, 1>, ...] 0 - neg edge, 1 - pos edge
+        DetailedGraphType signed_edges;  // [< <Lit, Lit>, EdgeType>, < <Lit, Lit>, 1>, ...], 0 - neg edge, 1 - pos edge
         RuleVec rules;
         RuleVec constraints;
 
@@ -56,10 +56,10 @@ namespace Sysu {
         static Prg *getPrg();
         // add/check information
         void add_rule(const Clasp::Asp::Rule& r);
-        void print();
-        int tmp;
+        void print_program();
     private:
         Prg();
+        void print_rule(const Rule& rule);
         void print_rules(const RuleVec& rules);
     };
 }
