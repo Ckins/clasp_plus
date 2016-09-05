@@ -38,7 +38,9 @@ namespace Sysu {
     void Prg::do_solve(const VarSet &P, const VarSet &N) {
 
         // if the partial assignment can not break constraints, quit
-        if (break_constraint(P, N)) return;
+        if (break_constraint(P, N)) {
+            return;
+        }
 
         // every reduce the graph find scc automatically
         dependencyGraph.graph_reduce(P, N);
@@ -78,19 +80,28 @@ namespace Sysu {
     }
 
     bool Prg::break_constraint(const VarSet &P, const VarSet &N) {
+        RULE_SATISFACTION constraint_judgement;
         for (RuleVec::const_iterator c_it = constraints.begin(); c_it != constraints.end(); ++c_it) {  // constraint
+            constraint_judgement = RULE_SATISFIED;
             for (LitVec::const_iterator b_it = c_it->body.begin(); b_it != c_it->body.end(); ++b_it) {  // constraint body
-                if (b_it->sign()) {                             // negLit
-                    if (P.find(b_it->var()) != P.end()) {       // true value, false literal
-                        std::cout << "Break Constraint: "; print_rule(*c_it);
-                        return true;
+                if (P.find(b_it->var()) != P.end()) {           // true value
+                    if (b_it->sign()) {                         // negLit, literal is false
+                        constraint_judgement = RULE_FAIL;       // constraint fail
+                        break;
                     }
-                } else {                                        // posLit
-                    if (N.find(b_it->var()) != N.end()) {       // false value, true literal
-                        std::cout << "Break Constraint: "; print_rule(*c_it);
-                        return true;
+                } else if (N.find(b_it->var()) != N.end()) {    // false value
+                    if (!b_it->sign()) {                        // posLit, literal is false
+                        constraint_judgement = RULE_FAIL;       // constraint fail
+                        break;
                     }
+                } else {
+                    constraint_judgement = RULE_UNKNOWN;
+                    break;
                 }
+            }
+            if (constraint_judgement == RULE_SATISFIED) {
+                std::cout << "Break Constraint: "; print_rule(*c_it);
+                return true;
             }
         }
         return false;

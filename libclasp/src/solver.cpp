@@ -1679,7 +1679,7 @@ void Solver::call_consistent_construction() {
 	Sysu::VarSet P, N;
 	Sysu::Prg* prg = Sysu::Prg::getPrg();
 
-//    std::cout << "\n===Partial Assignment " << ++count_emu_num << "===" << std::endl;
+    std::cout << "\n===Partial Assignment " << ++count_emu_num << "===" << std::endl;
 //	for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
 //        switch (assign_.value(it->second.lit.var())) {
 //        case value_true:
@@ -1695,9 +1695,7 @@ void Solver::call_consistent_construction() {
 //        }
 //	}
 //	std::cout << "\nP Size: " << P.size() << ", N Size: " << N.size() << std::endl;
-//    std::cout << "===Partial Assignment End===\n" << std::endl;
-    P.insert(2);
-    P.insert(3);
+    std::cout << "===Partial Assignment End===" << std::endl;
 
 	prg->do_solve(P, N);
 }

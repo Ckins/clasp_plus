@@ -194,6 +194,7 @@ namespace Sysu {
     }
     VarSetPair DependencyGraph::W_expand(const VarSet& P, const VarSet& N) {
         VarSetPair P_N_star, J_K;
+
         P_N_star = W_inf(P, N);
         if (failed(P_N_star)) {
             return P_N_star;
