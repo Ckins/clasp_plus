@@ -30,7 +30,7 @@ namespace Sysu {
     typedef std::set<Literal> LitSet;
     typedef VarSet SCC;
     typedef std::pair<VarSet, VarSet> VarSetPair;
-    typedef Clasp::PodVector<SCC>::type SCCVec;
+    typedef Clasp::PodVector<SCC*>::type SCCVec;
     typedef std::pair<Var, Var> SimpleEdge;
     typedef std::pair<Literal, Literal> Edge;
     typedef std::pair<Literal, LitVec> MultiEdge;
@@ -56,12 +56,14 @@ namespace Sysu {
         const DetailedGraphType* signed_edges_ptr;
 
         // constructor parts
+        ~DependencyGraph();
         void add_edge(const Rule& rule);
         void graph_reduce(const VarSet& P, const VarSet& N);
         void gl_reduce(const VarSet& P);
-        void resume();
+        void resume(GraphType& g);
 
         // construction Answer Set key algos
+        VarSet gather_facts(const VarSet& P);
         VarSet T_once_plus(const VarSet& P, const VarSet& N);
         VarSet greatest_unfounded_set(const VarSet& P);
         VarSetPair W_once(const VarSet& P, const VarSet& N);
@@ -75,16 +77,17 @@ namespace Sysu {
         bool whole_call_consistent();
 
         // auxiliary methods
-        void print_graph();
-        void print_SCCs();
-
         void mark_failure(VarSet& s);
         void mark_failure(VarSetPair& s1_s2);
         bool failed(const VarSet& s);
         bool failed(const VarSetPair& s1_s2);
 
+        void print_graph(const GraphType& g);
+        void print_SCCs();
+
     private:
         GraphType graph_;
+        GraphType graph_aux;
         SCCVec SCCs;
         VarSet vertices;
         unsigned long vertices_num;
@@ -96,12 +99,13 @@ namespace Sysu {
         int tarjan_index;
         LitVec tarjan_stack;
         // methods
+        void copy_graph();
         bool same(const VarSet& Ax, const VarSet& B);
         bool same(const VarSetPair& A1_B1, const VarSetPair& A2_B2);
-        bool has_outgoing_edge(const SCC& scc);
-        VarSetPair call_consistent(const SCC& scc);
-        void call_consistent_dfs(const SCC& scc, const Var& v, VarSet& J, VarSet& K, int mark);
-        void print_SCC(const SCC& scc);
+        bool has_outgoing_edge(SCC* scc);
+        VarSetPair call_consistent(SCC* scc);
+        void call_consistent_dfs(SCC* scc, const Var& v, VarSet& J, VarSet& K, int mark);
+        void print_SCC(SCC* scc);
     };
 }
 

@@ -42,7 +42,6 @@ namespace Sysu {
 
         // every reduce the graph find scc automatically
         dependencyGraph.graph_reduce(P, N);
-
         if (!dependencyGraph.whole_call_consistent()) {
             return;
         }
@@ -75,7 +74,7 @@ namespace Sysu {
                 }
             }
         }
-        std::cout << "\n===Answer Set End===\n" << std::endl;
+        std::cout << "\n===Answer Set End===" << std::endl;
     }
 
     bool Prg::break_constraint(const VarSet &P, const VarSet &N) {
@@ -83,46 +82,17 @@ namespace Sysu {
             for (LitVec::const_iterator b_it = c_it->body.begin(); b_it != c_it->body.end(); ++b_it) {  // constraint body
                 if (b_it->sign()) {                             // negLit
                     if (P.find(b_it->var()) != P.end()) {       // true value, false literal
-                        std::cout << "Break Constraint: ";
-                        print_rule(*c_it);
-
-                        std::cout << "Current Answer Set: ";
-                        for (VarSet::iterator it = P.begin(); it != P.end(); ++it) {
-                            std::cout << *it;
-                            for (Clasp::SymbolTable::const_iterator s_it = symbolTablePtr->begin();
-                                 s_it != symbolTablePtr->end(); ++s_it) {
-                                if (s_it->first == *it) {
-                                    std::cout << "(" << s_it->second.name.c_str() << ") ";
-                                }
-                            }
-                        }
-                        std::cout << std::endl;
-
+                        std::cout << "Break Constraint: "; print_rule(*c_it);
                         return true;
                     }
                 } else {                                        // posLit
                     if (N.find(b_it->var()) != N.end()) {       // false value, true literal
-                        std::cout << "Break Constraint: ";
-                        print_rule(*c_it);
-
-                        std::cout << "Current Answer Set: ";
-                        for (VarSet::iterator it = P.begin(); it != P.end(); ++it) {
-                            std::cout << *it;
-                            for (Clasp::SymbolTable::const_iterator s_it = symbolTablePtr->begin();
-                                 s_it != symbolTablePtr->end(); ++s_it) {
-                                if (s_it->first == *it) {
-                                    std::cout << "(" << s_it->second.name.c_str() << ") ";
-                                }
-                            }
-                        }
-                        std::cout << std::endl;
-
+                        std::cout << "Break Constraint: "; print_rule(*c_it);
                         return true;
                     }
                 }
             }
         }
-        std::cout << "Constraint Satisfied." << std::endl;
         return false;
     }
 

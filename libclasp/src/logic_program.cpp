@@ -260,7 +260,7 @@ bool LogicProgram::doEndProgram() {
     //------------------
     Sysu::Prg* prg = Sysu::Prg::getPrg();
 	prg->symbolTablePtr = &ctx()->symbolTable();
-	prg->print_program();
+//	prg->print_program();
     //------------------
     // End Modification
 
