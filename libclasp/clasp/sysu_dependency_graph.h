@@ -60,10 +60,10 @@ namespace Sysu {
         void add_edge(const Rule& rule);
         void graph_reduce(const VarSet& P, const VarSet& N);
         void gl_reduce(const VarSet& P);
-        void resume(GraphType& g);
+        void resume();
 
         // construction Answer Set key algos
-        VarSet gather_facts(const VarSet& P);
+        VarSet deduce(const VarSet& P);
         VarSet T_once_plus(const VarSet& P, const VarSet& N);
         VarSet greatest_unfounded_set(const VarSet& P);
         VarSetPair W_once(const VarSet& P, const VarSet& N);
@@ -82,12 +82,11 @@ namespace Sysu {
         bool failed(const VarSet& s);
         bool failed(const VarSetPair& s1_s2);
 
-        void print_graph(const GraphType& g);
+        void print_graph();
         void print_SCCs();
 
     private:
-        GraphType graph_;
-        GraphType graph_aux;
+        GraphType graph;
         SCCVec SCCs;
         VarSet vertices;
         unsigned long vertices_num;
@@ -99,7 +98,6 @@ namespace Sysu {
         int tarjan_index;
         LitVec tarjan_stack;
         // methods
-        void copy_graph();
         bool same(const VarSet& Ax, const VarSet& B);
         bool same(const VarSetPair& A1_B1, const VarSetPair& A2_B2);
         bool has_outgoing_edge(SCC* scc);

@@ -22,19 +22,18 @@ namespace Sysu {
 
     DependencyGraph::~DependencyGraph() {
         for (SCCVec::iterator it = SCCs.begin(); it != SCCs.end(); ++it) {
-//            delete it;
+            delete it;
         }
     }
     void DependencyGraph::add_edge(const Rule &rule) {
         for (Clasp::LitVec::const_iterator h_it = rule.heads.begin(); h_it != rule.heads.end(); ++h_it) {
-            graph_.push_back(MultiEdge(*h_it, rule.body));
-            graph_aux.push_back(MultiEdge(*h_it, rule.body));
+            graph.push_back(MultiEdge(*h_it, rule.body));
         }
         vertices.insert(rule.vars.begin(), rule.vars.end());
         vertices_num = vertices.size();
     }
-    void DependencyGraph::resume(GraphType& g) {
-        for (GraphType::iterator edge_it = g.begin(); edge_it != g.end(); ++edge_it) {
+    void DependencyGraph::resume() {
+        for (GraphType::iterator edge_it = graph.begin(); edge_it != graph.end(); ++edge_it) {
             edge_it->first.clearWatch();  // clear head
             for (LitVec::iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {
                 w_it->clearWatch();  // clear body
@@ -42,10 +41,10 @@ namespace Sysu {
         }
     }
     void DependencyGraph::graph_reduce(const VarSet& P, const VarSet& N) {
-        resume(graph_);
+        resume();
         // use Log(n) for assignment check
         std::map<Var, bool> assign;
-        std::map<Var, bool>::const_iterator a_it;
+        std::map<Var, bool>::const_iterator assign_it;
         for(VarSet::const_iterator it = P.begin(); it != P.end(); ++it) {
             assign[*it] = true;
         }
@@ -53,21 +52,21 @@ namespace Sysu {
             assign[*it] = false;
         }
         // graph reduce
-        for (GraphType::iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {  // head: edge_it->first
+        for (GraphType::iterator edge_it = graph.begin(); edge_it != graph.end(); ++edge_it) {  // head: edge_it->first
             if (assign.find(edge_it->first.var()) != assign.end()) {
-                edge_it->first.watch();               // head in P or N, remove it
+                edge_it->first.watch();                 // head in P or N, remove it
                 continue;
             }
             for (LitVec::iterator body_it = edge_it->second.begin(); body_it != edge_it->second.end(); ++body_it) {  // body: *w_it
-                a_it = assign.find(body_it->var());
-                if (a_it != assign.end()) {             // body literal is assigned
+                assign_it = assign.find(body_it->var());
+                if (assign_it != assign.end()) {
                     body_it->watch();                   // body in P or N, remove it
-                    if (a_it->second) {                 // w is true, Literal(w) uncertain
+                    if (assign_it->second) {            // assigned true, Literal uncertain
                         if (body_it->sign()) {          // negLit, Literal is false
                             edge_it->first.watch();     // edge fail
                             break;
                         }
-                    } else {                            // w is false, Literal(w) uncertain
+                    } else {                            // assigned false, Literal(w) uncertain
                         if (!body_it->sign()) {         // posLit, Literal is false
                             edge_it->first.watch();     // edge fail
                             break;
@@ -76,15 +75,14 @@ namespace Sysu {
                 }
             }
         }
-        copy_graph();
         find_SCCs();
 //        print_graph();
 //        print_SCCs();
     }
     void DependencyGraph::gl_reduce(const VarSet &P) {
-        resume(graph_aux);
+        resume();
         // GL-reduce
-        for (GraphType::iterator edge_it = graph_aux.begin(); edge_it != graph_aux.end(); ++edge_it) {  // head: edge_it->first
+        for (GraphType::iterator edge_it = graph.begin(); edge_it != graph.end(); ++edge_it) {  // head: edge_it->first
             for (LitVec::iterator body_it = edge_it->second.begin(); body_it != edge_it->second.end(); ++body_it) {  // body: *w_it
                 if (body_it->sign()) {                          // negLit
                     if (P.find(body_it->var()) != P.end()) {    // assigned true, negLit is false
@@ -97,10 +95,10 @@ namespace Sysu {
             }
         }
     }
-    VarSet DependencyGraph::gather_facts(const VarSet& P) {
+    VarSet DependencyGraph::deduce(const VarSet& P) {
         VarSet facts;
         RULE_SATISFACTION rule_judgement;
-        for (GraphType::iterator edge_it = graph_aux.begin(); edge_it != graph_aux.end(); ++edge_it) {  // head(v): edge_it->first
+        for (GraphType::iterator edge_it = graph.begin(); edge_it != graph.end(); ++edge_it) {  // head(v): edge_it->first
             if (!edge_it->first.watched()) {                        // rule is still in graph
                 rule_judgement = RULE_SATISFIED;
                 for (LitVec::iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {  // body(w): *w_it
@@ -135,33 +133,29 @@ namespace Sysu {
         // check rule satisfaction
         VarSet T_plus;
         RULE_SATISFACTION rule_judgement;
-        for (GraphType::iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {  // head(v): edge_it->first
-            if (!edge_it->first.watched()) {                        // rule is still in graph
-                rule_judgement = RULE_SATISFIED;
-                for (LitVec::iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {  // body(w): *w_it
-                    if (!w_it->watched()) {                         // body literal is still in graph
-                        a_it = assign.find(w_it->var());
-                        if (a_it != assign.end()) {                 // body literal is assigned
-                            if (a_it->second) {                     // assigned True
-                                if (w_it->sign()) {                 // negLit, Literal is false
-                                    rule_judgement = RULE_FAIL;     // rule fail
-                                    break;                          // no need to check rest
-                                }
-                            } else {                                // assigned False
-                                if (!w_it->sign()) {                // posLit, Literal is false
-                                    rule_judgement = RULE_FAIL;     // rule fail
-                                    break;                          // no need to check rest
-                                }
-                            }
-                        } else {                                    // body literal isn't assigned
-                            rule_judgement = RULE_UNKNOWN;          // rule unknown
-                            break;                                  // no need to check rest
+        for (GraphType::iterator edge_it = graph.begin(); edge_it != graph.end(); ++edge_it) {  // head(v): edge_it->first
+            rule_judgement = RULE_SATISFIED;
+            for (LitVec::iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {  // body(w): *w_it
+                a_it = assign.find(w_it->var());
+                if (a_it != assign.end()) {                 // body literal is assigned
+                    if (a_it->second) {                     // assigned True
+                        if (w_it->sign()) {                 // negLit, Literal is false
+                            rule_judgement = RULE_FAIL;     // rule fail
+                            break;                          // no need to check rest
+                        }
+                    } else {                                // assigned False
+                        if (!w_it->sign()) {                // posLit, Literal is false
+                            rule_judgement = RULE_FAIL;     // rule fail
+                            break;                          // no need to check rest
                         }
                     }
+                } else {                                    // body literal isn't assigned
+                    rule_judgement = RULE_UNKNOWN;          // rule unknown
+                    break;                                  // no need to check rest
                 }
-                if (rule_judgement == RULE_SATISFIED) {
-                    T_plus.insert(edge_it->first.var());
-                }
+            }
+            if (rule_judgement == RULE_SATISFIED) {
+                T_plus.insert(edge_it->first.var());
             }
         }
         return T_plus;
@@ -169,10 +163,10 @@ namespace Sysu {
     VarSet DependencyGraph::greatest_unfounded_set(const VarSet &P) {
         gl_reduce(P);
 
-        VarSet facts, obtained_facts = P, gus;  // phi is known or duduced from fact, gus is greatest unfounded set
+        VarSet facts, obtained_facts = P, gus;  // gus is greatest unfounded set
         do {
             facts = obtained_facts;
-            obtained_facts = gather_facts(facts);
+            obtained_facts = deduce(facts);
         } while (!same(facts, obtained_facts));
 
         // atoms - lfs = greatest unfounded set(gus)
@@ -231,7 +225,7 @@ namespace Sysu {
     }
     bool DependencyGraph::has_outgoing_edge(SCC* scc) {
         for (SCC::const_iterator v_it = scc->begin(); v_it != scc->end(); ++v_it) {
-            for (GraphType::iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {  // head: edge_it->first
+            for (GraphType::iterator edge_it = graph.begin(); edge_it != graph.end(); ++edge_it) {  // head: edge_it->first
                 if (*v_it == edge_it->first.var()  && !edge_it->first.watched()) {
                     for (LitVec::iterator body_it = edge_it->second.begin(); body_it != edge_it->second.end(); ++body_it) {
                         if (!body_it->watched() && scc->find(body_it->var()) == scc->end()) {  // in graph and not in scc
@@ -251,7 +245,7 @@ namespace Sysu {
         LOW = new int[vertices_num+10]();
         Literal v;
         // start tarjan
-        for (GraphType::const_iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {
+        for (GraphType::const_iterator edge_it = graph.begin(); edge_it != graph.end(); ++edge_it) {
             v = edge_it->first;
             if (!v.watched() && DFN[v.var()] <= 0) {  // w is still in graph & not visited by tarjan
                 tarjan(v);
@@ -271,7 +265,7 @@ namespace Sysu {
         DFN[v.var()] = LOW[v.var()] = ++tarjan_index;  // initial visiting mark
         tarjan_stack.push_back(v);
         Literal w;  // v -> w
-        for (GraphType::const_iterator edge_it = graph_.begin(); edge_it != graph_.end(); ++edge_it) {
+        for (GraphType::const_iterator edge_it = graph.begin(); edge_it != graph.end(); ++edge_it) {
             if (edge_it->first.var() == v.var()) {
                 for (LitVec::const_iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {  // v -> w
                     w = *w_it;
@@ -356,9 +350,9 @@ namespace Sysu {
         }
         std::cout << "---SCCs End---" << std::endl;
     }
-    void DependencyGraph::print_graph(const GraphType& g) {
+    void DependencyGraph::print_graph() {
         std::cout << "---Dependency Graph---" << std::endl;
-        for (GraphType::const_iterator r_it = g.begin(); r_it != g.end(); ++r_it) {
+        for (GraphType::const_iterator r_it = graph.begin(); r_it != graph.end(); ++r_it) {
             if (!r_it->first.watched()) {
                 std::cout << r_it->first.var() << " -> ";
                 int first_term = 1;
@@ -375,22 +369,6 @@ namespace Sysu {
             }
         }
         std::cout << "---Dependency Graph End---" << std::endl;
-    }
-    void DependencyGraph::copy_graph() {
-        for (GraphType::iterator r_it1 = graph_.begin(), r_it2 = graph_aux.begin(); r_it1 != graph_.end(); ++r_it1, ++r_it2) {
-            if (r_it1->first.watched()) {
-                r_it2->first.watch();
-            } else {
-                r_it2->first.clearWatch();
-            }
-            for (LitVec::iterator b_it1 = r_it1->second.begin(), b_it2 = r_it2->second.begin(); b_it1 != r_it1->second.end(); ++b_it1, ++b_it2) {
-                if (b_it1->watched()) {
-                    b_it2->watch();
-                } else {
-                    b_it2->clearWatch();
-                }
-            }
-        }
     }
     bool DependencyGraph::same(const VarSet& A, const VarSet& B) {
         if (A.size() == B.size()) {
