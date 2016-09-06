@@ -20,11 +20,6 @@ namespace Sysu {
         return heads.size() == 1 && heads[0].var() == 1;
     }
 
-    DependencyGraph::~DependencyGraph() {
-        for (SCCVec::iterator it = SCCs.begin(); it != SCCs.end(); ++it) {
-            delete it;
-        }
-    }
     void DependencyGraph::add_edge(const Rule &rule) {
         for (Clasp::LitVec::const_iterator h_it = rule.heads.begin(); h_it != rule.heads.end(); ++h_it) {
             graph.push_back(MultiEdge(*h_it, rule.body));
@@ -76,12 +71,9 @@ namespace Sysu {
             }
         }
         find_SCCs();
-//        print_graph();
-//        print_SCCs();
     }
     void DependencyGraph::gl_reduce(const VarSet &P) {
         resume();
-        // GL-reduce
         for (GraphType::iterator edge_it = graph.begin(); edge_it != graph.end(); ++edge_it) {  // head: edge_it->first
             for (LitVec::iterator body_it = edge_it->second.begin(); body_it != edge_it->second.end(); ++body_it) {  // body: *w_it
                 if (body_it->sign()) {                          // negLit
@@ -121,37 +113,25 @@ namespace Sysu {
         return facts;
     }
     VarSet DependencyGraph::T_once_plus(const VarSet& P, const VarSet& N) {
-        // use Log(n) for assignment check
-        std::map<Var, bool> assign;
-        std::map<Var, bool>::const_iterator a_it;
-        for(VarSet::const_iterator it = P.begin(); it != P.end(); ++it) {
-            assign[*it] = true;
-        }
-        for(VarSet::const_iterator it = N.begin(); it != N.end(); ++it) {
-            assign[*it] = false;
-        }
         // check rule satisfaction
         VarSet T_plus;
         RULE_SATISFACTION rule_judgement;
         for (GraphType::iterator edge_it = graph.begin(); edge_it != graph.end(); ++edge_it) {  // head(v): edge_it->first
             rule_judgement = RULE_SATISFIED;
             for (LitVec::iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {  // body(w): *w_it
-                a_it = assign.find(w_it->var());
-                if (a_it != assign.end()) {                 // body literal is assigned
-                    if (a_it->second) {                     // assigned True
-                        if (w_it->sign()) {                 // negLit, Literal is false
-                            rule_judgement = RULE_FAIL;     // rule fail
-                            break;                          // no need to check rest
-                        }
-                    } else {                                // assigned False
-                        if (!w_it->sign()) {                // posLit, Literal is false
-                            rule_judgement = RULE_FAIL;     // rule fail
-                            break;                          // no need to check rest
-                        }
+                if (P.find(w_it->var()) != P.end()) {           // assigned true
+                    if (w_it->sign()) {                         // negLit, Literal is false
+                        rule_judgement = RULE_FAIL;             // rule fail
+                        break;                                  // no need to check rest
                     }
-                } else {                                    // body literal isn't assigned
-                    rule_judgement = RULE_UNKNOWN;          // rule unknown
-                    break;                                  // no need to check rest
+                } else if (N.find(w_it->var()) != N.end()) {    // assigned false
+                    if (!w_it->sign()) {                        // posLit, Literal is false
+                        rule_judgement = RULE_FAIL;             // rule fail
+                        break;                                  // no need to check rest
+                    }
+                } else {                                        // not assigned
+                    rule_judgement = RULE_UNKNOWN;              // rule unknown
+                    break;                                      // no need to check rest
                 }
             }
             if (rule_judgement == RULE_SATISFIED) {
@@ -170,24 +150,30 @@ namespace Sysu {
         } while (!same(facts, obtained_facts));
 
         // atoms - lfs = greatest unfounded set(gus)
-        std::set_difference(vertices.begin(), vertices.end(), obtained_facts.begin(), obtained_facts.end(), std::inserter(gus, gus.begin()));
+        OrderedVarSet ordered_facts(obtained_facts.begin(), obtained_facts.end());
+        std::set_difference(vertices.begin(), vertices.end(), ordered_facts.begin(), ordered_facts.end(), std::inserter(gus, gus.begin()));
 
         return gus;
     }
-    VarSetPair DependencyGraph::W_once(const VarSet& P, const VarSet& N) {
-        VarSet T_plus, U;
+    VarSetPair DependencyGraph::W_once(const VarSet& P, const VarSet& N, bool enhance) {
+        VarSet T_plus, U, tmp1;
         T_plus = T_once_plus(P, N);
         U = greatest_unfounded_set(P);
+        if (enhance) {
+            T_plus.insert(P.begin(), P.end());
+            U.insert(N.begin(), N.end());
+        }
         return VarSetPair(T_plus, U);
     }
-    VarSetPair DependencyGraph::W_inf(const VarSet& P, const VarSet& N) {
-        VarSetPair P_N = VarSetPair(P, N), P1_N1 = W_once(P_N.first, P_N.second);
+    VarSetPair DependencyGraph::W_inf(const VarSet& P, const VarSet& N, bool enhance=false) {
+        VarSetPair P_N = VarSetPair(P, N), P1_N1 = W_once(P_N.first, P_N.second, enhance);
+        bool initial_empty = P_N.first.empty() && P_N.second.empty();
         int iterations = (int)vertices_num;  // !additional one to check last same set
-        while (!same(P_N, P1_N1) && iterations--) {
+        while ((!same(P_N, P1_N1)) && iterations--) {
             P_N = P1_N1;
-            P1_N1 = W_once(P_N.first, P_N.second);
+            P1_N1 = W_once(P_N.first, P_N.second, enhance);
         }
-        if (iterations < 0) {
+        if (iterations < 0 || (enhance && !initial_empty && P1_N1.first.empty() && P1_N1.second.empty())) {
             mark_failure(P1_N1);
         }
         return P1_N1;
@@ -222,6 +208,7 @@ namespace Sysu {
                 }
             }
         }
+
         return P_N_star;
     }
     bool DependencyGraph::has_outgoing_edge(SCC* scc) {
@@ -239,7 +226,7 @@ namespace Sysu {
         return false;
     }
     void DependencyGraph::find_SCCs() {
-        SCCs.clear();
+        clear_SCCs();
         tarjan_index = 0;
         tarjan_stack.clear();
         DFN = new int[vertices_num+10]();
@@ -337,6 +324,12 @@ namespace Sysu {
         }
         return true;
     }
+    void DependencyGraph::clear_SCCs() {
+        for (SCCVec::iterator it = SCCs.begin(); it != SCCs.end(); ++it) {
+            delete (*it);
+        }
+        SCCs.clear();
+    }
     void DependencyGraph::print_SCC(SCC* scc) {
         std::cout << "SCC: ";
         for (VarSet::const_iterator it = scc->begin(); it != scc->end(); ++it) {
@@ -372,16 +365,7 @@ namespace Sysu {
         std::cout << "---Dependency Graph End---" << std::endl;
     }
     bool DependencyGraph::same(const VarSet& A, const VarSet& B) {
-        if (A.size() == B.size()) {
-            for (VarSet::const_iterator it1 = A.begin(), it2 = B.begin(); it1 != A.end() && it2 != B.end(); ++it1, ++it2) {
-                if (*it1 != *it2) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
+        return A == B;
     }
     bool DependencyGraph::same(const VarSetPair& A1_B1, const VarSetPair& A2_B2) {
         return same(A1_B1.first, A2_B2.first) && same(A1_B1.second, A2_B2.second);

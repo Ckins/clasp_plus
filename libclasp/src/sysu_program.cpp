@@ -31,28 +31,36 @@ namespace Sysu {
                 }
             }
         }
-        // sxpose edge-sign table to dependency graph
+        // expose edge-sign table to dependency graph
         dependencyGraph.signed_edges_ptr = &signed_edges;
     }
 
     void Prg::do_solve(const VarSet &P, const VarSet &N) {
 
-        // if the partial assignment can not break constraints, quit
-        if (break_constraint(P, N)) {
+        // preprocessing - use enhanced W to get expanded (P, N) and make sure it doesn't break constraint
+        std::cout << "Preprocessing..." << std::endl;
+        VarSetPair P_N = dependencyGraph.W_inf(P, N, true);
+        if (dependencyGraph.failed(P_N) || break_constraint(P_N)) {
             return;
         }
 
-        // every reduce the graph find scc automatically
-        dependencyGraph.graph_reduce(P, N);
+        // optimization - judge whether reduced dependency graph is whole call-consistent at first
+        std::cout << "Optimizing..." << std::endl;
+        dependencyGraph.graph_reduce(P_N.first, P_N.second);
         if (!dependencyGraph.whole_call_consistent()) {
+            std::cout << "Program not Call-Consistent." << std::endl;
             return;
         }
 
-        // (p×, N×) = W.inf(P, N)
-        // iterative steps to get the fixed point under W
-        VarSetPair P_N_star = dependencyGraph.W_expand(P, N);
-        if (!dependencyGraph.failed(P_N_star) && !break_constraint(P_N_star.first, P_N_star.second)) {
-            report_answer(P_N_star.first);
+        // solving - (P*, N*) = W.inf(P, N), iterative steps to get the fixed point under W
+        std::cout << "Solving..." << std::endl;
+        VarSetPair P_N_star = dependencyGraph.W_expand(P_N.first, P_N.second);
+        if (!dependencyGraph.failed(P_N_star)) {
+            if (!break_constraint(P_N_star)) {
+                report_answer(P_N_star.first);
+            }
+        } else {
+            std::cout << "Fail to Reach Fixpoint." << std::endl;
         }
 
         // if (P', N') is null return;
@@ -79,17 +87,17 @@ namespace Sysu {
         std::cout << "\n===Answer Set End===" << std::endl;
     }
 
-    bool Prg::break_constraint(const VarSet &P, const VarSet &N) {
+    bool Prg::break_constraint(const VarSetPair &P_N) {
         RULE_SATISFACTION constraint_judgement;
         for (RuleVec::const_iterator c_it = constraints.begin(); c_it != constraints.end(); ++c_it) {  // constraint
             constraint_judgement = RULE_SATISFIED;
             for (LitVec::const_iterator b_it = c_it->body.begin(); b_it != c_it->body.end(); ++b_it) {  // constraint body
-                if (P.find(b_it->var()) != P.end()) {           // true value
+                if (P_N.first.find(b_it->var()) != P_N.first.end()) {           // true value
                     if (b_it->sign()) {                         // negLit, literal is false
                         constraint_judgement = RULE_FAIL;       // constraint fail
                         break;
                     }
-                } else if (N.find(b_it->var()) != N.end()) {    // false value
+                } else if (P_N.second.find(b_it->var()) != P_N.second.end()) {    // false value
                     if (!b_it->sign()) {                        // posLit, literal is false
                         constraint_judgement = RULE_FAIL;       // constraint fail
                         break;

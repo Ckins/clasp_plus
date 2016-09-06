@@ -18,16 +18,20 @@
  */
 #include <clasp/logic_program.h>
 #include <set>
+#include <unordered_set>
 #include <iostream>
 
 namespace Sysu {
+
+    enum EDGE_TYPE { NEG_EDGE, POS_EDGE };
+    enum RULE_SATISFACTION { RULE_FAIL=-1, RULE_UNKNOWN=0, RULE_SATISFIED=1};
 
     typedef Clasp::Var Var;
     typedef Clasp::Literal Literal;  // Literal.watched(): has been removed from graph
     typedef Clasp::VarVec VarVec;
     typedef Clasp::LitVec LitVec;
-    typedef std::set<Var> VarSet;
-    typedef std::set<Literal> LitSet;
+    typedef std::unordered_set<Var> VarSet;
+    typedef std::set<Var> OrderedVarSet;
     typedef VarSet SCC;
     typedef std::pair<VarSet, VarSet> VarSetPair;
     typedef Clasp::PodVector<SCC*>::type SCCVec;
@@ -35,10 +39,9 @@ namespace Sysu {
     typedef std::pair<Literal, Literal> Edge;
     typedef std::pair<Literal, LitVec> MultiEdge;
     typedef Clasp::PodVector<MultiEdge>::type GraphType;
-    enum EDGE_TYPE { NEG_EDGE, POS_EDGE };
-    enum RULE_SATISFACTION { RULE_FAIL=-1, RULE_UNKNOWN=0, RULE_SATISFIED=1};
     typedef std::pair<SimpleEdge, EDGE_TYPE> SignedEdge;
     typedef std::map<SimpleEdge, EDGE_TYPE> DetailedGraphType;
+
     const Var FAILURE_MARK = 0;
 
     class Rule {
@@ -56,7 +59,6 @@ namespace Sysu {
         const DetailedGraphType* signed_edges_ptr;
 
         // constructor parts
-        ~DependencyGraph();
         void add_edge(const Rule& rule);
         void graph_reduce(const VarSet& P, const VarSet& N);
         void gl_reduce(const VarSet& P);
@@ -66,8 +68,8 @@ namespace Sysu {
         VarSet deduce(const VarSet& P);
         VarSet T_once_plus(const VarSet& P, const VarSet& N);
         VarSet greatest_unfounded_set(const VarSet& P);
-        VarSetPair W_once(const VarSet& P, const VarSet& N);
-        VarSetPair W_inf(const VarSet& P, const VarSet& N);
+        VarSetPair W_once(const VarSet& P, const VarSet& N, bool enhance);
+        VarSetPair W_inf(const VarSet& P, const VarSet& N, bool enhance);
         VarSetPair W_expand(const VarSet& P, const VarSet& N);
 
         // Update internal SCCs and Return a copy of it.
@@ -88,7 +90,7 @@ namespace Sysu {
     private:
         GraphType graph;
         SCCVec SCCs;
-        VarSet vertices;
+        OrderedVarSet vertices;
         unsigned long vertices_num;
         //targan
         void tarjan(const Literal& v);
@@ -104,6 +106,7 @@ namespace Sysu {
         VarSetPair call_consistent(SCC* scc);
         void call_consistent_dfs(SCC* scc, const Var& v, VarSet& J, VarSet& K, int mark);
         void print_SCC(SCC* scc);
+        void clear_SCCs();
     };
 }
 

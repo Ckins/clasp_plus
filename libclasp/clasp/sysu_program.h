@@ -42,7 +42,7 @@ namespace Sysu {
         /*
          * check whether the assignment violate constraints
          */
-        bool break_constraint(const VarSet &P, const VarSet &N);
+        bool break_constraint(const VarSetPair &P_N);
 
 
         /*
