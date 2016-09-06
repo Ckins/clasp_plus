@@ -28,7 +28,6 @@ namespace Sysu {
         // member
         const Clasp::SymbolTable *symbolTablePtr;
         DependencyGraph dependencyGraph;
-        DetailedGraphType signed_edges;  // [< <Lit, Lit>, EdgeType>, < <Lit, Lit>, 1>, ...], 0 - neg edge, 1 - pos edge
         RuleVec rules;
         RuleVec constraints;
 

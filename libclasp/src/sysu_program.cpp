@@ -21,18 +21,6 @@ namespace Sysu {
             rules.push_back(rule);
             dependencyGraph.add_edge(rule);
         }
-        // edge-sign Table
-        for (LitVec::const_iterator h_it = rule.heads.begin(); h_it != rule.heads.end(); ++h_it) {
-            for (LitVec::const_iterator b_it = rule.body.begin(); b_it != rule.body.end(); ++b_it) {
-                if (b_it->sign()) {
-                    signed_edges.insert(SignedEdge(SimpleEdge(h_it->var(), b_it->var()), NEG_EDGE));
-                } else {
-                    signed_edges.insert(SignedEdge(SimpleEdge(h_it->var(), b_it->var()), POS_EDGE));
-                }
-            }
-        }
-        // expose edge-sign table to dependency graph
-        dependencyGraph.signed_edges_ptr = &signed_edges;
     }
 
     void Prg::do_solve(const VarSet &P, const VarSet &N) {

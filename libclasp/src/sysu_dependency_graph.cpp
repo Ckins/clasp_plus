@@ -26,6 +26,16 @@ namespace Sysu {
         }
         vertices.insert(rule.vars.begin(), rule.vars.end());
         vertices_num = vertices.size();
+        // detailed graph
+        for (LitVec::const_iterator h_it = rule.heads.begin(); h_it != rule.heads.end(); ++h_it) {
+            for (LitVec::const_iterator b_it = rule.body.begin(); b_it != rule.body.end(); ++b_it) {
+                if (b_it->sign()) {
+                    detailed_edges.insert(DetailedEdge(SimpleEdge(h_it->var(), b_it->var()), NEG_EDGE));
+                } else {
+                    detailed_edges.insert(DetailedEdge(SimpleEdge(h_it->var(), b_it->var()), POS_EDGE));
+                }
+            }
+        }
     }
     void DependencyGraph::resume() {
         for (GraphType::iterator edge_it = graph.begin(); edge_it != graph.end(); ++edge_it) {
@@ -160,20 +170,19 @@ namespace Sysu {
         T_plus = T_once_plus(P, N);
         U = greatest_unfounded_set(P);
         if (enhance) {
-            T_plus.insert(P.begin(), P.end());
+            T_plus.insert(P.begin(), P.end());  // insert large set too slow, therefore use unordered_set
             U.insert(N.begin(), N.end());
         }
         return VarSetPair(T_plus, U);
     }
     VarSetPair DependencyGraph::W_inf(const VarSet& P, const VarSet& N, bool enhance=false) {
         VarSetPair P_N = VarSetPair(P, N), P1_N1 = W_once(P_N.first, P_N.second, enhance);
-        bool initial_empty = P_N.first.empty() && P_N.second.empty();
         int iterations = (int)vertices_num;  // !additional one to check last same set
-        while ((!same(P_N, P1_N1)) && iterations--) {
+        while (!same(P_N, P1_N1) && iterations--) {
             P_N = P1_N1;
             P1_N1 = W_once(P_N.first, P_N.second, enhance);
         }
-        if (iterations < 0 || (enhance && !initial_empty && P1_N1.first.empty() && P1_N1.second.empty())) {
+        if (iterations < 0) {
             mark_failure(P1_N1);
         }
         return P1_N1;
@@ -286,8 +295,8 @@ namespace Sysu {
         bool p_in_J, q_in_J, pq_in_J, pq_in_K;  // !p_in_J implies p_in_K
         for (VarSet::const_iterator p_it = scc->begin(); p_it != scc->end(); ++p_it) {
             for (VarSet::const_iterator q_it = scc->begin(); q_it != scc->end(); ++q_it) { // p->q
-                signed_edge_it = signed_edges_ptr->find(SimpleEdge(*p_it, *q_it));
-                if (signed_edge_it != signed_edges_ptr->end()) {  // find p->q in graph
+                signed_edge_it = detailed_edges.find(SimpleEdge(*p_it, *q_it));
+                if (signed_edge_it != detailed_edges.end()) {  // find p->q in graph
                     p_in_J = J.find(*p_it) != J.end();
                     q_in_J = J.find(*q_it) != J.end();
                     pq_in_J = p_in_J && q_in_J;
@@ -310,8 +319,8 @@ namespace Sysu {
         }
         DetailedGraphType::const_iterator it;
         for (VarSet::const_iterator w_it = scc->begin(); w_it != scc->end(); ++w_it) {  // v -> w
-            it = signed_edges_ptr->find(SimpleEdge(v, *w_it));
-            if (it != signed_edges_ptr->end() && J.find(*w_it) == J.end() && K.find(*w_it) == K.end()) {
+            it = detailed_edges.find(SimpleEdge(v, *w_it));
+            if (it != detailed_edges.end() && J.find(*w_it) == J.end() && K.find(*w_it) == K.end()) {
                 call_consistent_dfs(scc, *w_it, J, K, it->second == POS_EDGE ? mark : !mark);
             }
         }

@@ -39,7 +39,7 @@ namespace Sysu {
     typedef std::pair<Literal, Literal> Edge;
     typedef std::pair<Literal, LitVec> MultiEdge;
     typedef Clasp::PodVector<MultiEdge>::type GraphType;
-    typedef std::pair<SimpleEdge, EDGE_TYPE> SignedEdge;
+    typedef std::pair<SimpleEdge, EDGE_TYPE> DetailedEdge;
     typedef std::map<SimpleEdge, EDGE_TYPE> DetailedGraphType;
 
     const Var FAILURE_MARK = 0;
@@ -56,7 +56,6 @@ namespace Sysu {
 
     class DependencyGraph {
     public:
-        const DetailedGraphType* signed_edges_ptr;
 
         // constructor parts
         void add_edge(const Rule& rule);
@@ -89,6 +88,7 @@ namespace Sysu {
 
     private:
         GraphType graph;
+        DetailedGraphType detailed_edges;
         SCCVec SCCs;
         OrderedVarSet vertices;
         unsigned long vertices_num;
