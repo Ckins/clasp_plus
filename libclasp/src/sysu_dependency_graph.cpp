@@ -182,7 +182,7 @@ namespace Sysu {
             P_N = P1_N1;
             P1_N1 = W_once(P_N.first, P_N.second, enhance);
         }
-        if (iterations < 0) {
+        if (iterations < 0 || (!enhance && P1_N1.first.empty() && P1_N1.second.empty() && !(P.empty() && N.empty()))) {
             mark_failure(P1_N1);
         }
         return P1_N1;

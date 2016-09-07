@@ -213,7 +213,7 @@ void ClaspAppBase::run() {
 		catch (const std::exception& e) { error(e.what()); }
 		catch (...)                     { ; }
 	}
-}
+ }
 
 bool ClaspAppBase::onSignal(int sig) {
 	if (!clasp_.get() || !clasp_->terminate(sig)) {
