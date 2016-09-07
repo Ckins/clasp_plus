@@ -20,8 +20,10 @@
 #include <set>
 #include <unordered_set>
 #include <iostream>
+#include <stdio.h>
 
 namespace Sysu {
+    const bool verbose = true;
 
     enum EDGE_TYPE { NEG_EDGE, POS_EDGE };
     enum RULE_SATISFACTION { RULE_FAIL=-1, RULE_UNKNOWN=0, RULE_SATISFIED=1};

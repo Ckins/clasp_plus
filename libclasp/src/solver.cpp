@@ -1679,7 +1679,7 @@ void Solver::call_consistent_construction() {
 	Sysu::VarSet P, N;
 	Sysu::Prg* prg = Sysu::Prg::getPrg();
 
-    std::cout << "\n===Partial Assignment " << ++count_emu_num << "===" << std::endl;
+//    std::cout << "\n===Partial Assignment " << ++count_emu_num << "===" << std::endl;
 	for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
         if (value(it->second.lit.var()) == value_free) {
 //            std::cout << "Free(" << it->second.name.c_str() << ") ";
@@ -1691,8 +1691,8 @@ void Solver::call_consistent_construction() {
 //            std::cout << "N(" << it->second.name.c_str() << ") ";
         }
 	}
-	std::cout << "\nP Size: " << P.size() << ", N Size: " << N.size() << std::endl;
-    std::cout << "===Partial Assignment End===" << std::endl;
+//	std::cout << "\nP Size: " << P.size() << ", N Size: " << N.size() << std::endl;
+//    std::cout << "===Partial Assignment End===" << std::endl;
 
 	prg->do_solve(P, N);
 }

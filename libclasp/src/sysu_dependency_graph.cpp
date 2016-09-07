@@ -100,17 +100,16 @@ namespace Sysu {
     VarSet DependencyGraph::deduce(const VarSet& P) {
         VarSet facts;
         RULE_SATISFACTION rule_judgement;
+        // remove body and collect head
         for (GraphType::iterator edge_it = graph.begin(); edge_it != graph.end(); ++edge_it) {  // head(v): edge_it->first
             if (!edge_it->first.watched()) {                        // rule is still in graph
                 rule_judgement = RULE_SATISFIED;
                 for (LitVec::iterator w_it = edge_it->second.begin(); w_it != edge_it->second.end(); ++w_it) {  // body(w): *w_it
                     if (!w_it->watched()) {                         // body literal is still in graph
-                        if (P.find(w_it->var()) == P.end()) {       // body literal is not assigned true
-                            rule_judgement = RULE_FAIL;             // rule fail
-                            break;                                  // no need to check rest
-                        } else {                                    // body literal isn't assigned
+                        if (P.find(w_it->var()) != P.end()) {       // body literal is not assigned true
+                            w_it->watch();                          // remove body
+                        } else {
                             rule_judgement = RULE_UNKNOWN;          // rule unknown
-                            break;                                  // no need to check rest
                         }
                     }
                 }
@@ -119,6 +118,7 @@ namespace Sysu {
                 }
             }
         }
+        // add already known facts
         facts.insert(P.begin(), P.end());
         return facts;
     }
@@ -153,14 +153,14 @@ namespace Sysu {
     VarSet DependencyGraph::greatest_unfounded_set(const VarSet &P) {
         gl_reduce(P);
 
-        VarSet facts, obtained_facts = P, gus;  // gus is greatest unfounded set
+        VarSet facts, increased_facts, gus;  // gus is greatest unfounded set
         do {
-            facts = obtained_facts;
-            obtained_facts = deduce(facts);
-        } while (!same(facts, obtained_facts));
+            facts = increased_facts;
+            increased_facts = deduce(facts);
+        } while (!same(facts, increased_facts));
 
         // atoms - lfs = greatest unfounded set(gus)
-        OrderedVarSet ordered_facts(obtained_facts.begin(), obtained_facts.end());
+        OrderedVarSet ordered_facts(increased_facts.begin(), increased_facts.end());
         std::set_difference(vertices.begin(), vertices.end(), ordered_facts.begin(), ordered_facts.end(), std::inserter(gus, gus.begin()));
 
         return gus;
