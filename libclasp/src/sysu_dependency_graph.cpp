@@ -213,6 +213,8 @@ namespace Sysu {
                         graph_reduce(P_N_star.first, P_N_star.second);
                         has_possible_consistent_SCC = true;
                         break;
+                    } else {
+                        return J_K;
                     }
                 }
             }

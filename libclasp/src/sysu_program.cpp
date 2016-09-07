@@ -48,7 +48,7 @@ namespace Sysu {
                 report_answer(P_N_star.first);
             }
         } else {
-            if (verbose) std::cout << "Fail to Reach Fixpoint." << std::endl;
+            if (verbose) std::cout << "Program Fail." << std::endl;
         }
 
         // if (P', N') is null return;
@@ -63,7 +63,7 @@ namespace Sysu {
 
     void Prg::report_answer(const VarSet &P) {
         FILE *awswer_set_stream = fopen( "/Users/jon/Desktop/clasp/examples/verification/answer_set", "w" );
-        if (verbose) std::cout << "\n===Answer Set===" << std::endl;
+        std::cout << "\n===Answer Set===" << std::endl;
         for (VarSet::const_iterator it = P.begin(); it != P.end(); ++it) {
             std::cout << *it;
             for (Clasp::SymbolTable::const_iterator s_it = symbolTablePtr->begin();
@@ -74,7 +74,7 @@ namespace Sysu {
                 }
             }
         }
-        if (verbose) std::cout << "\n===Answer Set End===" << std::endl;
+        std::cout << "\n===Answer Set End===" << std::endl;
         fclose( awswer_set_stream );
     }
 
