@@ -5,17 +5,7 @@
 #ifndef CLASP_SYSU_DEPENDENCY_GRAPH_H
 #define CLASP_SYSU_DEPENDENCY_GRAPH_H
 
-/*!
- * \file
- * namespace sysu
- * Contains the definition of the class program and related classes.
- *
- * tarjian algorithm
- *
- * call-consistent whole graph check algo
- *
- * T-algo and unfounded algo and w-expand are all implement internally
- */
+
 #include <clasp/logic_program.h>
 #include <set>
 #include <unordered_set>
