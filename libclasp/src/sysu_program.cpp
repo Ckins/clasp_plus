@@ -63,7 +63,7 @@ namespace Sysu {
 
     void Prg::report_answer(const VarSet &P) {
         FILE *awswer_set_stream = fopen( "/Users/jon/Desktop/clasp/examples/verification/answer_set", "w" );
-        std::cout << "\n===Answer Set===" << std::endl;
+        if (verbose) std::cout << "\n===Answer Set===" << std::endl;
         for (VarSet::const_iterator it = P.begin(); it != P.end(); ++it) {
             std::cout << *it;
             for (Clasp::SymbolTable::const_iterator s_it = symbolTablePtr->begin();
