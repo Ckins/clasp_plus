@@ -33,6 +33,11 @@
 #include <vector>
 #include <iosfwd>
 #include <memory>
+
+//=========SYSU Modify=========
+#include <clasp/sysu_program.h>
+//=========SYSU Modify End=====
+
 namespace Clasp { namespace Cli {
 /////////////////////////////////////////////////////////////////////////////////////////
 // clasp exit codes

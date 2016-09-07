@@ -401,6 +401,12 @@ std::istream& ClaspAppBase::getStream() {
 	else {
 		static std::ifstream file;
 		if (file.is_open()) return file;
+
+		//=====SYSU Modify==========
+		Sysu::Prg* prg = Sysu::Prg::getPrg();
+		prg->name = input[0].c_str();
+		//=====SYSU Modify End======
+
 		file.open(input[0].c_str());
 		if (!file) { throw std::runtime_error("Can not read from '"+input[0]+"'");  }
 		return file;

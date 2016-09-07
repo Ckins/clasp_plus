@@ -27,7 +27,10 @@
 #include <clasp/solver_types.h>
 #include <clasp/solver_strategies.h>
 #include <clasp/shared_context.h>
+
+//========SYSU Modify==========
 #include <clasp/sysu_program.h>
+//========SYSU Modify End======
 
 namespace Clasp { 
 

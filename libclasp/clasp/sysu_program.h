@@ -25,6 +25,7 @@ namespace Sysu {
      */
     class Prg {
     public:
+        std::string name;
         // member
         const Clasp::SymbolTable *symbolTablePtr;
         DependencyGraph dependencyGraph;
