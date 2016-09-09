@@ -26,29 +26,29 @@ namespace Sysu {
     void Prg::do_solve(const VarSet &P, const VarSet &N) {
 
         // preprocessing - use enhanced W to get expanded (P, N) and make sure it doesn't break constraint
-        if (verbose) std::cout << "Preprocessing..." << std::endl;
+        if (verbose) { std::cout << "Preprocessing..." << std::endl; }
         VarSetPair P_N = dependencyGraph.W_inf(P, N, true);
         if (dependencyGraph.failed(P_N) || break_constraint(P_N)) {
             return;
         }
 
         // optimization - judge whether reduced dependency graph is whole call-consistent at first
-        if (verbose) std::cout << "Optimizing..." << std::endl;
+        if (verbose) { std::cout << "Optimizing..." << std::endl; }
         dependencyGraph.graph_reduce(P_N.first, P_N.second);
         if (!dependencyGraph.whole_call_consistent()) {
-            if (verbose) std::cout << "Program not Whole Call-Consistent." << std::endl;
+            if (verbose) { std::cout << "Program not Whole Call-Consistent." << std::endl; }
             return;
         }
 
         // solving - (P*, N*) = W.inf(P, N), iterative steps to get the fixed point under W
-        if (verbose) std::cout << "Solving..." << std::endl;
+        if (verbose) { std::cout << "Solving..." << std::endl; }
         VarSetPair P_N_star = dependencyGraph.W_expand(P_N.first, P_N.second);
         if (!dependencyGraph.failed(P_N_star)) {
             if (!break_constraint(P_N_star)) {
                 report_answer(P_N_star.first);
             }
         } else {
-            if (verbose) std::cout << "Program Fail." << std::endl;
+            if (verbose) { std::cout << "Program Fail." << std::endl; }
         }
 
         // if (P', N') is null return;
@@ -63,7 +63,7 @@ namespace Sysu {
 
     void Prg::report_answer(const VarSet &P) {
         FILE *awswer_set_stream = fopen( "/Users/jon/Desktop/clasp/examples/verification/answer_set", "w" );
-        if (verbose) std::cout << "\n===Answer Set===" << std::endl;
+        if (verbose) { std::cout << "\n===Answer Set===" << std::endl; }
         for (VarSet::const_iterator it = P.begin(); it != P.end(); ++it) {
             std::cout << *it;
             for (Clasp::SymbolTable::const_iterator s_it = symbolTablePtr->begin();
@@ -99,7 +99,7 @@ namespace Sysu {
                 }
             }
             if (constraint_judgement == RULE_SATISFIED) {
-                if (verbose) std::cout << "Break Constraint: "; print_rule(*c_it);
+                if (verbose) { std::cout << "Break Constraint: "; print_rule(*c_it); }
                 return true;
             }
         }
