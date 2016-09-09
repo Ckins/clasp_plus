@@ -62,20 +62,21 @@ namespace Sysu {
     }
 
     void Prg::report_answer(const VarSet &P) {
-        FILE *awswer_set_stream = fopen( "/Users/jon/Desktop/clasp/examples/verification/answer_set", "w" );
-        if (verbose) { std::cout << "\n===Answer Set===" << std::endl; }
+        std::string path("../");
+        path += name;
+        path += ".result";
+        FILE *awswer_set_stream = fopen( path.c_str(), "w" );
+        if (verbose) std::cout << "\n===Answer Set===" << std::endl;
         for (VarSet::const_iterator it = P.begin(); it != P.end(); ++it) {
-            std::cout << *it;
             for (Clasp::SymbolTable::const_iterator s_it = symbolTablePtr->begin();
                  s_it != symbolTablePtr->end(); ++s_it) {
                 if (s_it->first == *it) {
-                    std::cout << "(" << s_it->second.name.c_str() << ") ";
                     fprintf( awswer_set_stream, "%s ", s_it->second.name.c_str());
                 }
             }
         }
-        std::cout << "\n===Answer Set End===" << std::endl;
         fclose( awswer_set_stream );
+        exit(88);
     }
 
     bool Prg::break_constraint(const VarSetPair &P_N) {
