@@ -777,8 +777,11 @@ int TextOutput::printSep(CategoryKey k) const {
 }
 void TextOutput::printModel(const SymbolTable& sym, const Model& m, PrintLevel x) {
 	if (x == modelQ()) {
+		//===Modify===
 		Sysu::Prg* prg = Sysu::Prg::getPrg();
 		std::cerr << "Assignment time : " << prg->partial_assignment_num << std::endl;
+		std::cerr << "Backjump: " << prg->backjump_num << std::endl;
+		//===Modify End===
 		comment(1, "Answer: %" PRIu64"\n", m.num);
 		printf("%s", format[cat_value]);
 		if (sym.type() == SymbolTable::map_indirect) { printNames(sym, m); }

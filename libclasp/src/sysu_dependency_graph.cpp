@@ -197,16 +197,16 @@ namespace Sysu {
     VarSetPair DependencyGraph::W_expand(const VarSet& P, const VarSet& N) {
         VarSetPair P_N_star, J_K;
 
-//        std::cout << "W_inf" << std::endl;
+        std::cout << "W_inf" << std::endl;
         P_N_star = W_inf(P, N);
-//        std::cout << "W_inf End" << std::endl;
+        std::cout << "W_inf End" << std::endl;
         if (failed(P_N_star)) {
             return P_N_star;
         }
 
-//        std::cout << "Reduce" << std::endl;
+        std::cout << "Reduce" << std::endl;
         graph_reduce(P_N_star.first, P_N_star.second);
-//        std::cout << "Reduce End" << std::endl;
+        std::cout << "Reduce End" << std::endl;
 
         std::cout << "Call-consistent Classification" << std::endl;
         bool has_possible_consistent_SCC = true;
@@ -230,13 +230,14 @@ namespace Sysu {
                         graph_reduce(P_N_star.first, P_N_star.second);
 //                        std::cout << "Reduce End" << std::endl;
                         has_possible_consistent_SCC = true;
+                        break;
                     } else {
                         return J_K;
                     }
                 }
             }
         }
-//        std::cout << "Call-consistent Classification End" << std::endl;
+        std::cout << "Call-consistent Classification End" << std::endl;
 
         return P_N_star;
     }

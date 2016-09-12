@@ -8,6 +8,7 @@ namespace Sysu {
 
     Prg::Prg() {
         partial_assignment_num = 0;
+        backjump_num = 0;
     }
 
     Prg* Prg::getPrg() {

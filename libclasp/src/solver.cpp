@@ -134,7 +134,7 @@ Solver::Solver(SharedContext* ctx, uint32 id)
 	, lastSimp_(0)
 	, shufSimp_(0)
 	, initPost_(0)
-	, count_emu_num(0){
+	, count_emu_num(0) {
 	Var sentVar = assign_.addVar();
 	assign_.setValue(sentVar, value_true);
 	markSeen(sentVar);
@@ -851,6 +851,10 @@ bool Solver::test(Literal p, PostPropagator* c) {
 
 bool Solver::resolveConflict() {
 	assert(hasConflict());
+	//===Modify===
+	Sysu::Prg* prg = Sysu::Prg::getPrg();
+	prg->backjump_num++;
+	//===Modify End
 	if (decisionLevel() > rootLevel()) {
 		if (decisionLevel() != backtrackLevel() && searchMode() != SolverStrategies::no_learning) {
 			uint32 uipLevel = analyzeConflict();
@@ -1714,7 +1718,7 @@ void Solver::call_consistent_construction() {
             }
         }
     }
-	prg->do_solve(P, N);
+//	prg->do_solve(P, N);
 }
 
 }
