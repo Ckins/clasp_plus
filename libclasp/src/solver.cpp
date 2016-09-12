@@ -1636,7 +1636,6 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
 
 			// ----------modification--------
 
-//            printAssignment();
             call_consistent_construction();
 
 			// --------------end-------------
@@ -1679,20 +1678,32 @@ void Solver::call_consistent_construction() {
 	Sysu::VarSet P, N;
 	Sysu::Prg* prg = Sysu::Prg::getPrg();
 
-    if (Sysu::verbose) std::cout << "\n===Partial Assignment " << ++count_emu_num << "===" << std::endl;
-	for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
-        if (value(it->second.lit.var()) == value_free) {
-//            std::cout << "Free(" << it->second.name.c_str() << ") ";
-        } else if (isTrue(it->second.lit)) {
-            P.insert(it->first);
-//            std::cout << "P(" << it->second.name.c_str() << ") ";
-        } else {
-            N.insert(it->first);
-//            std::cout << "N(" << it->second.name.c_str() << ") ";
+    if (Sysu::verbose) {
+        std::cout << "\n===Partial Assignment " << ++count_emu_num << "===" << std::endl;
+        for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
+            if (value(it->second.lit.var()) == value_free) {
+                std::cout << "Free(" << it->second.name.c_str() << ") ";
+            } else if (isTrue(it->second.lit)) {
+                P.insert(it->first);
+                std::cout << "P(" << it->second.name.c_str() << ") ";
+            } else {
+                N.insert(it->first);
+                std::cout << "N(" << it->second.name.c_str() << ") ";
+            }
         }
-	}
-//	if (Sysu::verbose) std::cout << "\nP Size: " << P.size() << ", N Size: " << N.size() << std::endl;
-//	if (Sysu::verbose) std::cout << "===Partial Assignment End===" << std::endl;
+        std::cout << "\nP Size: " << P.size() << ", N Size: " << N.size() << std::endl;
+        std::cout << "===Partial Assignment End===" << std::endl;
+    } else {
+        for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
+            if (value(it->second.lit.var()) == value_free) {
+                continue;
+            } else if (isTrue(it->second.lit)) {
+                P.insert(it->first);
+            } else {
+                N.insert(it->first);
+            }
+        }
+    }
 
 	prg->do_solve(P, N);
 }
