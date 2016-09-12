@@ -41,7 +41,10 @@ namespace Sysu {
         LitVec heads;  // Vector<Var>
         LitVec body;  // Vector<Literal>
         VarSet vars;
+        Rule();
         Rule(const Clasp::Asp::Rule& r);
+        void add_head(const Var h);
+        void add_body(const Literal b);
         bool is_constraint();
     };
     typedef Clasp::PodVector<Rule>::type RuleVec;

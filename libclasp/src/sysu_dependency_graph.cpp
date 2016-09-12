@@ -6,15 +6,22 @@
 
 namespace Sysu {
 
+    Rule::Rule() {}
     Rule::Rule(const Clasp::Asp::Rule &r) {
         for (Clasp::VarVec::const_iterator it = r.heads.begin(); it != r.heads.end(); ++it) {
-            vars.insert(*it);
-            heads.push_back(Clasp::posLit(*it));
+            add_head(*it);
         }
         for (Clasp::WeightLitVec::const_iterator it = r.body.begin(); it != r.body.end(); ++it) {
-            vars.insert(it->first.var());
-            body.push_back(it->first);
+            add_body(it->first);
         }
+    }
+    void Rule::add_head(const Var h) {
+        vars.insert(h);
+        heads.push_back(Clasp::posLit(h));
+    }
+    void Rule::add_body(const Literal b) {
+        vars.insert(b.var());
+        body.push_back(b);
     }
     bool Rule::is_constraint() {
         return heads.size() == 1 && heads[0].var() == 1;
@@ -303,7 +310,7 @@ namespace Sysu {
                     q_in_J = J.find(*q_it) != J.end();
                     pq_in_J = p_in_J && q_in_J;
                     pq_in_K = !p_in_J && !q_in_J;
-                    if ((signed_edge_it->second == POS_EDGE && (!pq_in_J && !pq_in_K))
+                    if ((signed_edge_it->second == POS_EDGE && !(pq_in_J || pq_in_K))
                         || (signed_edge_it->second == NEG_EDGE && (pq_in_J || pq_in_K))) {
                         mark_failure(J);
                         return VarSetPair(J, K);
