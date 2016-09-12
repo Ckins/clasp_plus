@@ -25,6 +25,7 @@ namespace Sysu {
      */
     class Prg {
     public:
+        int partial_assignment_num;
         std::string name;
         // member
         const Clasp::SymbolTable *symbolTablePtr;

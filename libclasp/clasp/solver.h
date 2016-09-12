@@ -85,10 +85,11 @@ struct SearchLimits {
  */
 class Solver {
 	// ----------------------------------------------------
-	// modified by kinsang - Aug 25
+	// modified by kinsang - Sept. 8th
 public:
 	void printAssignment();
 	void call_consistent_construction();
+	void calculate_partial_times();
 private:
 	uint32 count_emu_num;
 
