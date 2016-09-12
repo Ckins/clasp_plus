@@ -1636,7 +1636,9 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
 
 			// ----------modification--------
 
-            call_consistent_construction();
+            // call_consistent_construction();
+
+			calculate_partial_times();
 
 			// --------------end-------------
 
@@ -1649,6 +1651,13 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
 	for (Var v = 0; v <= numVars(); ++v) { model.push_back(value(v)); }
 	if (satPrepro()) { satPrepro()->extendModel(model, temp_); }
 	return value_true;
+}
+
+void Solver::calculate_partial_times() {
+	Sysu::VarSet P, N;
+	Sysu::Prg* prg = Sysu::Prg::getPrg();
+
+	prg->partial_assignment_num++;
 }
 
 void Solver::printAssignment() {
@@ -1678,6 +1687,7 @@ void Solver::call_consistent_construction() {
 	Sysu::VarSet P, N;
 	Sysu::Prg* prg = Sysu::Prg::getPrg();
     ++count_emu_num;
+	prg->partial_assignment_num++;
     if (Sysu::verbose) {
         std::cout << "\n===Partial Assignment " << count_emu_num << "===" << std::endl;
         for (SymbolTable::const_iterator it = symbolTable().begin(); it != symbolTable().end(); ++it) {
@@ -1704,7 +1714,6 @@ void Solver::call_consistent_construction() {
             }
         }
     }
-
 	prg->do_solve(P, N);
 }
 

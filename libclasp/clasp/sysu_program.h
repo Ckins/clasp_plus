@@ -52,7 +52,6 @@ namespace Sysu {
 
         void report_answer(const VarSet &P);
 
-
         // auxiliary function
         static Prg *getPrg();
         // add/check information

@@ -6,7 +6,9 @@
 
 namespace Sysu {
 
-    Prg::Prg() {}
+    Prg::Prg() {
+        partial_assignment_num = 0;
+    }
 
     Prg* Prg::getPrg() {
         static Prg prg;
@@ -45,7 +47,7 @@ namespace Sysu {
         VarSetPair P_N_star = dependencyGraph.W_expand(P_N.first, P_N.second);
         if (!dependencyGraph.failed(P_N_star)) {
             if (!break_constraint(P_N_star)) {
-//                report_answer(P_N_star.first);
+                report_answer(P_N_star.first);
                 exit(88);
             }
         } else {
@@ -79,6 +81,7 @@ namespace Sysu {
             }
             std::cout << "\n===Answer Set End===" << std::endl;
         } else {
+            std::cout << "Assignment time : " << partial_assignment_num << std::endl;
             for (VarSet::const_iterator it = P.begin(); it != P.end(); ++it) {
                 for (Clasp::SymbolTable::const_iterator s_it = symbolTablePtr->begin();
                      s_it != symbolTablePtr->end(); ++s_it) {
