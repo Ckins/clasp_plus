@@ -25,6 +25,7 @@ namespace Sysu {
      */
     class Prg {
     public:
+        int partial_assignment_num;
         std::string name;
         // member
         const Clasp::SymbolTable *symbolTablePtr;
@@ -50,7 +51,6 @@ namespace Sysu {
          */
 
         void report_answer(const VarSet &P);
-
 
         // auxiliary function
         static Prg *getPrg();

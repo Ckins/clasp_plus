@@ -777,6 +777,8 @@ int TextOutput::printSep(CategoryKey k) const {
 }
 void TextOutput::printModel(const SymbolTable& sym, const Model& m, PrintLevel x) {
 	if (x == modelQ()) {
+		Sysu::Prg* prg = Sysu::Prg::getPrg();
+		std::cerr << "Assignment time : " << prg->partial_assignment_num << std::endl;
 		comment(1, "Answer: %" PRIu64"\n", m.num);
 		printf("%s", format[cat_value]);
 		if (sym.type() == SymbolTable::map_indirect) { printNames(sym, m); }
