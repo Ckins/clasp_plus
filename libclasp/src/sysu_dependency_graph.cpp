@@ -197,35 +197,46 @@ namespace Sysu {
     VarSetPair DependencyGraph::W_expand(const VarSet& P, const VarSet& N) {
         VarSetPair P_N_star, J_K;
 
+//        std::cout << "W_inf" << std::endl;
         P_N_star = W_inf(P, N);
+//        std::cout << "W_inf End" << std::endl;
         if (failed(P_N_star)) {
             return P_N_star;
         }
 
+//        std::cout << "Reduce" << std::endl;
         graph_reduce(P_N_star.first, P_N_star.second);
+//        std::cout << "Reduce End" << std::endl;
 
+        std::cout << "Call-consistent Classification" << std::endl;
         bool has_possible_consistent_SCC = true;
         while (has_possible_consistent_SCC) {
             has_possible_consistent_SCC = false;
             for (SCCVec::const_iterator scc_it = SCCs.begin(); scc_it != SCCs.end(); ++scc_it) {
                 if (!has_outgoing_edge(*scc_it)) {
+//                    std::cout << "Get J&K" << std::endl;
                     J_K = call_consistent(*scc_it);
+//                    std::cout << "Get J&K End" << std::endl;
                     if (!failed(J_K)) {  // a call-consistent scc without outgoing edge
                         P_N_star.first.insert(J_K.first.begin(), J_K.first.end());  // P + J
                         P_N_star.second.insert(J_K.second.begin(), J_K.second.end());  // N + K
+//                        std::cout << "W_inf" << std::endl;
                         P_N_star = W_inf(P_N_star.first, P_N_star.second);
+//                        std::cout << "W_inf End" << std::endl;
                         if (failed(P_N_star)) {
                             return P_N_star;
                         }
+//                        std::cout << "Reduce" << std::endl;
                         graph_reduce(P_N_star.first, P_N_star.second);
+//                        std::cout << "Reduce End" << std::endl;
                         has_possible_consistent_SCC = true;
-                        break;
                     } else {
                         return J_K;
                     }
                 }
             }
         }
+//        std::cout << "Call-consistent Classification End" << std::endl;
 
         return P_N_star;
     }
@@ -260,6 +271,7 @@ namespace Sysu {
         // end tarjan
         delete[] DFN;
         delete[] LOW;
+        std::cout << "SCC: " << SCCs.size() << std::endl;
     }
     bool DependencyGraph::find_var(const LitVec& vec, const Literal& item) {
         for (LitVec::const_iterator it = vec.begin(); it != vec.end(); ++it)
