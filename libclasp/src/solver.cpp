@@ -1636,7 +1636,7 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
 
 			// ----------modification--------
 
-            // call_consistent_construction();
+            call_consistent_construction();
 
 			calculate_partial_times();
 
