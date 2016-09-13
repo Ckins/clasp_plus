@@ -4,7 +4,7 @@
 
 #include <clasp/sysu_program.h>
 
-namespace Sysu {
+namespace SYSU {
 
     Prg::Prg() {
         partial_assignment_num = 0;
@@ -36,7 +36,7 @@ namespace Sysu {
         }
 
         // optimization - judge whether reduced dependency graph is whole call-consistent at first
-        if (verbose) { std::cout << "Optimizing..." << std::endl; }
+        if (verbose) { std::cout << "Prejudging..." << std::endl; }
         dependencyGraph.graph_reduce(P_N.first, P_N.second);
         if (!dependencyGraph.whole_call_consistent()) {
             if (verbose) { std::cout << "Program not Whole Call-Consistent." << std::endl; }
@@ -49,7 +49,6 @@ namespace Sysu {
         if (!dependencyGraph.failed(P_N_star)) {
             if (!break_constraint(P_N_star)) {
                 report_answer(P_N_star.first);
-                exit(88);
             }
         } else {
             if (verbose) { std::cout << "Program Fail." << std::endl; }
@@ -82,7 +81,6 @@ namespace Sysu {
             }
             std::cout << "\n===Answer Set End===" << std::endl;
         } else {
-            std::cout << "Assignment time : " << partial_assignment_num << std::endl;
             for (VarSet::const_iterator it = P.begin(); it != P.end(); ++it) {
                 for (Clasp::SymbolTable::const_iterator s_it = symbolTablePtr->begin();
                      s_it != symbolTablePtr->end(); ++s_it) {
@@ -93,6 +91,7 @@ namespace Sysu {
             }
         }
         fclose( awswer_set_stream );
+        std::cout << "\nWrote Answer Set: " << path.c_str()  << "\n===Statistics===\nPartial Assignments: " << partial_assignment_num << "\nBackjumps: " << backjump_num << "\n===Statistics End===" << std::endl;
         exit(88);
     }
 

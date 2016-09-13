@@ -12,7 +12,7 @@
  */
 #include <clasp/sysu_dependency_graph.h>
 
-namespace Sysu {
+namespace SYSU {
     class DependencyGraph;
 
     /*

@@ -258,9 +258,8 @@ bool LogicProgram::doEndProgram() {
 
     // SYSU Modification (16-08-29)
     //------------------
-    Sysu::Prg* prg = Sysu::Prg::getPrg();
+    SYSU::Prg* prg = SYSU::Prg::getPrg();
 	prg->symbolTablePtr = &ctx()->symbolTable();
-//	prg->print_program();
     //------------------
     // End Modification
 
@@ -478,7 +477,7 @@ LogicProgram& LogicProgram::addRule(const Rule& r) {
 
 	// SYSU Modification (junhong 16/08/25)
 	//------------------
-	Sysu::Prg::getPrg()->add_rule(r);
+	SYSU::Prg::getPrg()->add_rule(r);
 	//------------------
 	// End Modification
 

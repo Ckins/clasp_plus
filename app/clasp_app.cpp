@@ -403,7 +403,7 @@ std::istream& ClaspAppBase::getStream() {
 		if (file.is_open()) return file;
 
 		//=====SYSU Modify==========
-		Sysu::Prg* prg = Sysu::Prg::getPrg();
+		SYSU::Prg* prg = SYSU::Prg::getPrg();
 		prg->name = input[0].c_str();
 		//=====SYSU Modify End======
 
