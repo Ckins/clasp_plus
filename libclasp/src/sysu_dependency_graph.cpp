@@ -2,7 +2,7 @@
 // Created by Junhong on 8/26/16.
 //
 
-#include <clasp/SYSU_dependency_graph.h>
+#include <clasp/sysu_dependency_graph.h>
 
 namespace SYSU {
 
