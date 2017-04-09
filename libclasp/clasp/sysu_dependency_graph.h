@@ -13,7 +13,7 @@
 #include <stdio.h>
 
 namespace SYSU {
-    const bool verbose = 1;
+    const bool verbose = 0;
 
     enum EDGE_TYPE { NEG_EDGE, POS_EDGE };
     enum RULE_SATISFACTION { RULE_FAIL=-1, RULE_UNKNOWN=0, RULE_SATISFIED=1};

@@ -92,7 +92,7 @@ namespace SYSU {
         }
         fclose( awswer_set_stream );
         std::cout << "\nWrote Answer Set: " << path.c_str()  << "\n===Statistics===\nPartial Assignments: " << partial_assignment_num << "\nBackjumps: " << backjump_num << "\n===Statistics End===" << std::endl;
-        exit(88);
+        exit(10);
     }
 
     bool Prg::break_constraint(const VarSetPair &P_N) {

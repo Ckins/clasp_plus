@@ -229,7 +229,8 @@ namespace SYSU {
 
         return P_N_star;
     }
-    bool DependencyGraph::has_outgoing_edge(SCC* scc) {
+    bool DependencyGraph::
+    has_outgoing_edge(SCC* scc) {
         for (SCC::const_iterator v_it = scc->begin(); v_it != scc->end(); ++v_it) {
             for (GraphType::iterator edge_it = graph.begin(); edge_it != graph.end(); ++edge_it) {  // head: edge_it->first
                 if (*v_it == edge_it->first.var()  && !edge_it->first.watched()) {

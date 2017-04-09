@@ -1634,13 +1634,13 @@ ValueRep Solver::search(SearchLimits& limit, double rf) {
 				for (conflicts = 1; resolveConflict() && !propagate(); ) { ++conflicts; }
 				limit.conflicts -= conflicts < limit.conflicts ? conflicts : limit.conflicts;
 				if (local && updateBranch(conflicts) >= local)              { limit.local = 0; }
-				if (hasConflict() || (decisionLevel() == 0 && !simplify())) { return value_false; }
+				if (hasConflict()|| (decisionLevel() == 0 && !simplify())) { return value_false; }
 				if ((limit.reached() || learntLimit(limit))&&numFreeVars()) { return value_free;  }
 			}
 
 			// ----------modification--------
 
-            calculate_partial_times();
+            // calculate_partial_times();
             call_consistent_construction();
 
 			// --------------end-------------
@@ -1689,6 +1689,7 @@ void Solver::printAssignment() {
 void Solver::call_consistent_construction() {
 	SYSU::VarSet P, N;
 	SYSU::Prg* prg = SYSU::Prg::getPrg();
+	prg->partial_assignment_num++;
     ++count_emu_num;
     if (SYSU::verbose) {
         std::cout << "\n===Partial Assignment " << count_emu_num << "===" << std::endl;
