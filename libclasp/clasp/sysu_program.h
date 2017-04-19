@@ -11,7 +11,7 @@
  * Contains the definition of the class program and related classes.
  */
 #include <clasp/sysu_dependency_graph.h>
-
+#include <cstdio>
 namespace SYSU {
     class DependencyGraph;
 

@@ -69,12 +69,13 @@ namespace SYSU {
         path += name;
         path += ".result";
         FILE *awswer_set_stream = fopen( path.c_str(), "w" );
-        if (verbose) {
-            std::cout << "\n===Answer Set===" << std::endl;
+        bool output = true;
+        if (output) {
+            printf("\n%s\n", "===Answer Set===");
             for (VarSet::const_iterator it = P.begin(); it != P.end(); ++it) {
                 for (Clasp::SymbolTable::const_iterator s_it = symbolTablePtr->begin(); s_it != symbolTablePtr->end(); ++s_it) {
                     if (s_it->first == *it) {
-                        std::cout << s_it->second.name.c_str() << " ";
+                        printf("%s ", s_it->second.name.c_str());
                         fprintf( awswer_set_stream, "%s ", s_it->second.name.c_str());
                     }
                 }
@@ -91,7 +92,7 @@ namespace SYSU {
             }
         }
         fclose( awswer_set_stream );
-        std::cout << "\nWrote Answer Set: " << path.c_str()  << "\n===Statistics===\nPartial Assignments: " << partial_assignment_num << "\nBackjumps: " << backjump_num << "\n===Statistics End===" << std::endl;
+        std::cout << "\nWrote Answer Set: " << path.c_str()  << "\n===Statistics===\nPartial Assignments: " << partial_assignment_num-1 << "\nBackjumps: " << backjump_num << "\n===Statistics End===" << std::endl;
         exit(10);
     }
 

@@ -779,7 +779,9 @@ void TextOutput::printModel(const SymbolTable& sym, const Model& m, PrintLevel x
 	if (x == modelQ()) {
 		//===Modify===
 		SYSU::Prg* prg = SYSU::Prg::getPrg();
-		std::cerr << "Assignment time : " << prg->partial_assignment_num << std::endl;
+		int tmp_pn = 0;
+		if (prg->partial_assignment_num > 1) tmp_pn = prg->partial_assignment_num - 1;
+		std::cerr << "Assignment time : " << tmp_pn << std::endl;
 		std::cerr << "Backjumps: " << prg->backjump_num << std::endl;
 		//===Modify End===
 		comment(1, "Answer: %" PRIu64"\n", m.num);
