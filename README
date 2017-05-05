@@ -1,6 +1,6 @@
 Overview
   This is an open-source project originally from Potassco Team.
-  We apply some optimization to the solver and name it as clasp plus.
+  Based on clasp, we implement some sufficient condition of ASP.
 
 Introduction
  http://www.cs.uni-potsdam.de/clasp/
